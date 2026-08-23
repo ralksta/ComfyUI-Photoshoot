@@ -77,6 +77,10 @@ def _safe_name(name):
 
     Guards against "../" and directory separators - the name comes from a free
     text field and would otherwise end up in a path unchecked.
+
+    nodes/identity.py imports this rather than keeping a second copy. Two
+    sanitisers drifting apart would mean one of them is the weaker one, and
+    nobody would notice which.
     """
     name = re.sub(r"[^\w\s-]", "", (name or "").strip(), flags=re.UNICODE)
     return re.sub(r"\s+", " ", name).strip()[:80]

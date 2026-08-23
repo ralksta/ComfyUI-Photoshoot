@@ -45,6 +45,7 @@ nodes/
   shooting.py            the series: planning, ratios, seeds
   dock.py                API for optional extension packs
   store.py               save/load for all four stores + prompt assembly
+  identity.py            reference images per person, camera-coupled strength
   api.py                 serves the preset tables to the interface
 js/
   shared.mjs     preset loading, Nodes 2.0 adaptation, state, graphToPrompt hook

@@ -16,8 +16,8 @@ nodes/dock.py is the interface for optional add-on packs and is deliberately
 not imported here - it registers no nodes, the packs import it themselves.
 """
 
-from .nodes import (api, expression_builder, person_builder, pose_builder,
-                    shooting, store)
+from .nodes import (api, expression_builder, identity, person_builder,
+                    pose_builder, shooting, store)
 
 api.register()
 
@@ -25,7 +25,7 @@ NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}
 
 for _modul in (person_builder, expression_builder, pose_builder, shooting,
-               store):
+               store, identity):
     NODE_CLASS_MAPPINGS.update(_modul.NODE_CLASS_MAPPINGS)
     NODE_DISPLAY_NAME_MAPPINGS.update(_modul.NODE_DISPLAY_NAME_MAPPINGS)
 

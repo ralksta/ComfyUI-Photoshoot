@@ -41,7 +41,7 @@ def main():
     kit = lade_paket()
 
     assert kit.WEB_DIRECTORY == "./js"
-    assert len(kit.NODE_CLASS_MAPPINGS) == 14, len(kit.NODE_CLASS_MAPPINGS)
+    assert len(kit.NODE_CLASS_MAPPINGS) == 16, len(kit.NODE_CLASS_MAPPINGS)
     assert set(kit.NODE_CLASS_MAPPINGS) == set(kit.NODE_DISPLAY_NAME_MAPPINGS)
     print("Nodes: %d" % len(kit.NODE_CLASS_MAPPINGS))
 
@@ -207,6 +207,59 @@ def main():
     zahl = sum(len(v) for m in ("person", "ausdruck", "pose", "shooting")
                for v in tab[m].values())
     print("Uebersetzung: %d Labels, keine Luecke" % zahl)
+
+    # Reference images. torch, numpy and PIL are not installed here - identity.py
+    # imports them inside its functions for exactly that reason, so everything
+    # below the pixels is testable without them. torch itself gets a stub with
+    # the two calls the empty path makes.
+    idm = importlib.import_module("krea2kit.nodes.identity")
+
+    # The name goes into a path. A name that walks out of the folder must not
+    # survive - same guard as the block store, same helper.
+    assert idm._safe_name("../../etc/passwd") == "etcpasswd"
+    for boese in ("..", "/", "", "   ", "./."):
+        try:
+            idm._ordner(boese)
+        except ValueError:
+            pass
+        else:
+            assert False, "Ordner aus unbrauchbarem Namen: %r" % boese
+
+    # The strength follows the framing, tight to wide, and never leaves the two
+    # widgets' range. Monotone: a wider shot may never want more adapter.
+    werte = [idm.staerke_fuer(lbl, 0.15, 0.95) for lbl, _ in sh.KAMERA]
+    assert werte[0] == 0.95 and abs(werte[-1] - 0.15) < 1e-9, werte
+    assert werte == sorted(werte, reverse=True), werte
+    assert all(0.15 <= w <= 0.95 for w in werte), werte
+    # Nothing wired to kamera_label: single-image work, treat it as a close-up.
+    assert idm.staerke_fuer(None, 0.15, 0.95) == 0.95
+    assert idm.staerke_fuer("", 0.15, 0.95) == 0.95
+    assert idm.staerke_fuer("Handyfoto", 0.15, 0.95) == 0.95
+    # The two widgets rescale the whole curve, they do not shift the shape.
+    flach = [idm.staerke_fuer(lbl, 0.5, 0.5) for lbl, _ in sh.KAMERA]
+    assert flach == [0.5] * len(sh.KAMERA), flach
+    print("Identitaet/Staerke: %s" % ", ".join("%s %.2f" % (lbl, w)
+                                               for (lbl, _), w in zip(sh.KAMERA, werte)))
+
+    # References of different sizes cannot go into one batch - torch.cat needs
+    # identical height and width. Everything matching the first image survives.
+    assert idm._auswahl([]) == ([], [])
+    assert idm._auswahl([(64, 64)]) == ([0], [])
+    assert idm._auswahl([(64, 64), (32, 99), (64, 64)]) == ([0, 2], [1])
+    assert idm._auswahl([(32, 99), (64, 64), (64, 64)]) == ([0], [1, 2])
+    print("Identitaet/Mischgroessen: ok")
+
+    # A person without references must not take the graph down - the whole
+    # bootstrap workflow runs the first series without one.
+    torch_stub = types.SimpleNamespace(zeros=lambda *masse: ("zeros",) + masse)
+    sys.modules.setdefault("torch", torch_stub)
+    idnode = kit.NODE_CLASS_MAPPINGS["Krea2Identity"]()
+    for name in (None, idm.LEER, "Niemand Gespeichertes"):
+        bild, staerke, anzahl = idnode.laden(name=name, kamera_label="Totale")
+        assert anzahl == 0 and bild == ("zeros", 1, 1, 1, 3), (name, bild)
+        assert abs(staerke - 0.15) < 1e-9, staerke
+    assert kit.NODE_CLASS_MAPPINGS["Krea2Identity"].IS_CHANGED(name=idm.LEER) == 0.0
+    print("Identitaet/leer: kein Absturz, anzahl 0")
 
     # Placeholders and the recommended order.
     join = kit.NODE_CLASS_MAPPINGS["Krea2PromptJoin"]()

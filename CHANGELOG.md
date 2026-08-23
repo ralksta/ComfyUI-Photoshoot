@@ -4,6 +4,74 @@ Notable changes to Photoshoot. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-08-24
+
+### Added
+
+- **Reference images — `Photoshoot Identity Save` and `Photoshoot Identity`.**
+  44 attributes describe a type, not an identity. They invent someone who does
+  not exist yet, and two runs of the same fields are two sisters, because
+  English has no word for eye spacing, nose bridge width or jaw angle. That is
+  a gap in the language, not in the field list; a forty-fifth field would not
+  close it.
+
+  The save node writes an `IMAGE` to
+  `ComfyUI/user/krea2_person_refs/<name>/NNN.png`, at most eight per person, and
+  passes the image straight through so it can sit inline behind a VAE decode.
+  The load node hands all references of one person back as one batch, plus a
+  strength and a count.
+
+  **Passthrough, not a bundled adapter.** The nodes emit an `IMAGE` and a
+  `FLOAT` and know nothing about what consumes them — InstantID, PuLID,
+  IP-Adapter FaceID, InfiniteYou, Qwen-Image-Edit, Flux Kontext/Redux and
+  ReActor all want a face image and a weight, and every one of them wants it in
+  a different node with a different scale. Shipping one would tie the pack to a
+  model family and end the "no dependencies" line in the README. torch, numpy
+  and PIL are imported inside the functions, so the package still imports
+  without them.
+
+  **This does not make the attributes obsolete.** They are the casting step;
+  the reference is the anchoring step, and the adapter carries the face and
+  nothing else. Hair length, figure, the coat and the boots still come out of
+  the person block, and so does everything the series varies.
+
+- **The strength follows the framing.** `KAMERA_ANTEIL` in `nodes/identity.py`
+  runs Detail 1.0 · close-up 0.9 · portrait 0.8 · medium 0.6 · cowboy 0.45 ·
+  full body 0.3 · wide 0.0 — positions between `staerke_fern` and
+  `staerke_nah`, not weights, so the two widgets rescale the whole curve for
+  whichever adapter you own. Wire `kamera_label`, the last output of the
+  Photoshoot node, and it follows the series by itself; without it the near
+  value applies.
+
+  Same reasoning as the detail levels: on a wide shot the head is forty pixels
+  across, an adapter at full weight has nothing to work with there, and it still
+  pulls — it fights the framing and drags the head back up in size. Where the
+  adapter goes quiet the `[identity]` person block is already carrying the
+  series.
+
+  The table is checked against `shooting.KAMERA` at import. A renamed framing
+  makes the pack fail to import and say which label drifted, rather than falling
+  back to full strength on a wide shot.
+
+- **The hero-shot bootstrap.** `nur_wenn_leer` writes only while the person has
+  no reference yet: run a short close-up series on the attributes alone, let the
+  first frame seed the identity, and every later run consumes it. Deliberately
+  two switches you flip yourself rather than something automatic inside the
+  Photoshoot node — "run 1 seeds, runs 2–40 consume" would make a series behave
+  differently on its first run than on its 41st, and re-running it would quietly
+  produce a different person. Documented in
+  [docs/nodes.md](docs/nodes.md#reference-images).
+
+  Missing references never raise: a 1×1 black image, `anzahl` 0 and a line in
+  the log. References of differing sizes cannot go into one batch, so everything
+  matching the first file survives and the rest is skipped by name — skipped
+  rather than resized, because resizing changes how much of the frame the face
+  occupies and that is exactly what a face adapter reads.
+
+  `tests/smoke.py` covers the name sanitising, the empty-folder path, the
+  interpolation at all seven framings and with none, and the mixed-resolution
+  selection.
+
 ## [2.0.6] — 2026-08-23
 
 ### Added

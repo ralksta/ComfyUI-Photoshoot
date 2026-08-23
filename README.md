@@ -139,6 +139,50 @@ relaxed brows, lips closed, head held straight, editorial photography, 85mm
 The `[full]` / `[figure]` / `[identity]` tag is that detail level — compare
 photo 1 with photo 8 and the lipstick is gone.
 
+## The same person, or two sisters?
+
+44 attributes describe a **type**, not an identity. *Scandinavian, late 20s,
+long copper waves, a straight nose, greyish green almond eyes* — run that twice
+and you get two women who could be sisters, because English has no word for eye
+spacing, nose bridge width or jaw angle. That is not a gap in the field list. It
+is a gap in the language, and no forty-fifth field closes it.
+
+A reference image does. **Photoshoot Identity** stores images of a person under
+her name in `ComfyUI/user/krea2_person_refs/` and hands them back as an `IMAGE`
+batch plus a strength — which you wire into whatever face adapter you already
+have: InstantID, PuLID, IP-Adapter FaceID, InfiniteYou, Qwen-Image-Edit,
+Flux Kontext or Redux, ReActor. This pack ships none of them and adds no
+dependencies; it emits pixels and a number, the same way it emits text.
+
+**The attributes are not made obsolete by this.** They are the casting step —
+they invent someone who does not exist yet. The reference is the anchoring step,
+and it carries the **face** and nothing else. Hair length, figure, the charcoal
+coat and the black boots still come out of the person block, and so does
+everything the series varies. Cast first, then anchor.
+
+**The strength follows the framing.** A face adapter at full weight on a wide
+shot has forty pixels of head to work with. It cannot put a face in there, but
+it still pulls: it fights the framing and drags the head back up in size — the
+exact failure the detail levels were built to avoid. So the strength runs from
+full on an extreme close-up down to the far value on a wide shot, along the same
+seven framings:
+
+```text
+Detail 1.00 · Close-up 0.90 · Portrait 0.80 · Medium 0.60
+Cowboy 0.45 · Full body 0.30 · Wide 0.00
+```
+
+Those are positions between your two widgets, not weights — every adapter reads
+its weight on a different scale, so you set the height of the curve and the node
+keeps the shape. Where the adapter goes quiet, the `[identity]` person block is
+already carrying the series on its own.
+
+**The hero shot.** You do not need a photo to start with. Run the series once on
+the attributes alone, pick the frame where she looks right, and feed it back
+through **Photoshoot Identity Save** with *only when empty* on: the first run
+seeds the identity, every later run consumes it. Details in
+[the node reference](docs/nodes.md#reference-images).
+
 ## Wiring
 
 ```text
@@ -249,6 +293,8 @@ Settings → Comfy → Locale. The prompt is identical either way — see
 | **Photoshoot Build Prompt** | drops the parts into your prompt text |
 | **Save / Load** | persons, scenes, styles and prompts under `ComfyUI/user/krea2_*` |
 | **Photoshoot Pick Blocks** | four dropdowns, four outputs in one node |
+| **Photoshoot Identity Save** | stores reference images of a person, up to eight |
+| **Photoshoot Identity** | hands them back as a batch, plus a strength that follows the framing |
 
 [**Full reference →**](docs/nodes.md) — every control, and why the awkward ones
 are the way they are: how focus is coupled to framing, why the person block

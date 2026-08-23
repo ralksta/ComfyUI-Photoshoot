@@ -202,6 +202,120 @@ frame area even in a wide shot. If the text contains no placeholder at all, the
 node appends the parts in that same order (camera and scene before person, style
 last).
 
+### Reference images
+
+| Node | Purpose |
+|---|---|
+| **Photoshoot Identity Save** | writes reference images of a person to `ComfyUI/user/krea2_person_refs/<name>/NNN.png`, at most eight |
+| **Photoshoot Identity** | outputs all references of one person as an `IMAGE` batch, plus `strength` (FLOAT) and `count` (INT) |
+
+The attribute fields describe a type. They invent someone who does not exist
+yet, and two runs of the same 44 fields are two sisters — text has no word for
+eye spacing, nose bridge width or jaw angle. A reference image closes that gap
+and only that: the adapter carries the **face**, everything else still comes out
+of the person block. Casting first, anchoring second.
+
+Both nodes are a **pure passthrough**. They emit an image and a number and know
+nothing about what consumes them, so the pack stays model-agnostic and
+dependency-free. Whether that goes into InstantID, PuLID, IP-Adapter FaceID,
+InfiniteYou, Qwen-Image-Edit, Flux Kontext/Redux or ReActor is your wiring.
+
+#### Wiring
+
+```text
+Photoshoot Identity ──image────────► reference / face image input of your adapter
+                    ├─strength─────► its weight input
+                    └─count────────► (optional) 0 means: no reference stored
+
+Photoshoot Series ──camera_label──► Photoshoot Identity (kamera_label)
+```
+
+`camera_label` is the **last** output of Photoshoot Series and is what couples
+the strength to the framing. Without it wired, the strength stays at
+`strength_near` — someone working on a single image is working on a portrait far
+more often than on a wide shot.
+
+Which input on the adapter takes what differs per pack: InstantID and
+InfiniteYou want the face image plus a `weight`, IP-Adapter FaceID an image and
+a `weight`, ReActor a source face image and no weight at all (feed the strength
+into its blend or skip it), Qwen-Image-Edit and Flux Kontext take the reference
+as an edit image and read strength as denoise or conditioning weight. The node
+has no opinion about any of that.
+
+#### The strength follows the framing
+
+| Framing | Position |
+|---|---|
+| Detail (extreme close-up) | 1.00 |
+| Close-up | 0.90 |
+| Portrait | 0.80 |
+| Medium shot | 0.60 |
+| Cowboy shot | 0.45 |
+| Full body | 0.30 |
+| Wide shot | 0.00 |
+
+Those are positions on the axis between `strength_far` (default 0.15) and
+`strength_near` (default 0.95), **not** weights. Every adapter reads its weight
+on a different scale — 1.0 is timid on one and blown out on another — so the two
+widgets set the height of the curve and the table keeps its shape. Set them
+equal and the strength is constant.
+
+The reason is the same one behind the detail levels: on a wide shot the head is
+forty pixels across. A face adapter at full weight has nothing to work with
+there, but it still pulls — it fights the framing and drags the head back up in
+size. Turning it down as the camera pulls back is the image-side counterpart to
+the person block shrinking with distance. Where the adapter goes quiet, the
+`[identity]` person block is already carrying the series.
+
+The table lives in `nodes/identity.py` as `KAMERA_ANTEIL` and is checked against
+`shooting.KAMERA` at import. If a framing is ever renamed, the pack refuses to
+import and says which label drifted — a silently missing entry would fall back
+to full strength on a wide shot, precisely the case the table exists for.
+
+#### The hero shot (bootstrap)
+
+You do not need a photo of her to begin with — she does not exist yet.
+
+1. Build the person from the attributes and run a short series with **no**
+   reference. Restrict the camera to close-ups for this pass; that is where a
+   usable face lands.
+2. Put **Photoshoot Identity Save** behind your VAE decode, type her name, set
+   *save* on and *only when empty* on.
+3. Run once. The first frame that comes through seeds the identity; because
+   *only when empty* is on, later runs write nothing and the folder is not
+   flooded with forty variations of the same face.
+4. Refresh (R), pick her in **Photoshoot Identity**, wire it into your adapter,
+   and run the real series. Every photo now anchors to that one face.
+
+This is deliberately not automated inside the Photoshoot node. "Run 1 seeds,
+runs 2–40 consume" would mean the series behaves differently on its first run
+than on its 41st, and re-running a series would silently produce a different
+person. Two switches you flip yourself are honest about what is happening.
+
+Later you can add better references by hand: same node, *only when empty* off.
+Eight is the cap — past a handful the adapter is averaging over the same face
+and the extra images only cost VRAM. A batch that would exceed the cap is
+trimmed and the node says so.
+
+#### Details
+
+- New names appear in the dropdown only after a refresh (R), like every other
+  loading node here.
+- **Mixed resolutions:** references collected over months are not all the same
+  size, and a batch needs identical dimensions. Everything matching the **first**
+  file survives; the rest is skipped and named in the log. Skipped rather than
+  resized on purpose — resizing changes how much of the frame the face occupies,
+  which is exactly what a face adapter reads, and a stretched reference would
+  quietly push the batch towards a wrong face shape. A skipped file is visible,
+  a distorted one is not.
+- **Nothing stored:** a 1×1 black image, `count` 0, and a warning in the log. It
+  never raises — a missing reference must not take a 40-run series down with it.
+  Use `count` if you want a downstream branch to switch itself off.
+- The name is sanitised with the same helper the block store uses, so a name
+  typed as `../../something` cannot leave the folder.
+- The references live under `ComfyUI/user/krea2_person_refs/` and are **not**
+  part of this repository. Back them up deliberately, like the other stores.
+
 ### Extension packs (docking)
 
 A pack that wants to change the person should not rewrite the finished prompt

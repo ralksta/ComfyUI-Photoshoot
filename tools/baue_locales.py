@@ -42,6 +42,8 @@ TITEL = {
     "Krea2PromptLoad": "Photoshoot Load Prompt",
     "Krea2Bausteine": "Photoshoot Pick Blocks",
     "Krea2PromptJoin": "Photoshoot Build Prompt",
+    "Krea2IdentitySave": "Photoshoot Identity Save",
+    "Krea2Identity": "Photoshoot Identity",
 }
 
 # Node type -> English description (the tooltip on the node).
@@ -77,6 +79,16 @@ BESCHREIBUNG = {
         "{pose}, {extra}, {expression}, {style}. The German spellings still work. "
         "{extra} is for extension packs. Without placeholders: camera and scene "
         "before the person."),
+    "Krea2IdentitySave": (
+        "Stores reference images of a person under her name, at most eight. "
+        "'only when empty' writes only while no reference exists yet — that way "
+        "the first run of a series seeds the identity and every later run uses "
+        "it. The image passes through unchanged."),
+    "Krea2Identity": (
+        "Outputs the reference images of a person as one batch, plus a strength "
+        "that follows the framing: full up close, nearly off on a wide shot. "
+        "Wire it into a face adapter (InstantID, PuLID, IP-Adapter FaceID, ...) "
+        "— this pack does not ship one."),
     "Krea2PersonSave": SPEICHERN, "Krea2PersonLoad": LADEN,
     "Krea2SzeneSave": SPEICHERN,  "Krea2SzeneLoad": LADEN,
     "Krea2StilSave": SPEICHERN,   "Krea2StilLoad": LADEN,
@@ -94,6 +106,9 @@ ANSCHLUESSE = {
     "width": "width", "height": "height", "width_in": "width_in",
     "height_in": "height_in", "bildseed": "image_seed", "seed": "seed",
     "name": "name", "speichern": "save",
+    "image": "image", "staerke": "strength", "staerke_nah": "strength_near",
+    "staerke_fern": "strength_far", "anzahl": "count",
+    "nur_wenn_leer": "only_when_empty",
 }
 
 

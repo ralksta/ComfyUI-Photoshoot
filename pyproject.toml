@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-photoshoot"
 description = "Build a person once, then shoot a whole series: framing, pose, placement, expression and aspect ratio vary while the person stays the same."
-version = "2.0.6"
+version = "2.1.0"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 

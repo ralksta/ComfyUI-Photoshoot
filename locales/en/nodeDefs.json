@@ -45,6 +45,58 @@
       }
     }
   },
+  "Krea2Identity": {
+    "display_name": "Photoshoot Identity",
+    "description": "Outputs the reference images of a person as one batch, plus a strength that follows the framing: full up close, nearly off on a wide shot. Wire it into a face adapter (InstantID, PuLID, IP-Adapter FaceID, ...) — this pack does not ship one.",
+    "inputs": {
+      "name": {
+        "name": "name"
+      },
+      "staerke_nah": {
+        "name": "strength_near"
+      },
+      "staerke_fern": {
+        "name": "strength_far"
+      },
+      "kamera_label": {
+        "name": "camera_label"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "image"
+      },
+      "1": {
+        "name": "strength"
+      },
+      "2": {
+        "name": "count"
+      }
+    }
+  },
+  "Krea2IdentitySave": {
+    "display_name": "Photoshoot Identity Save",
+    "description": "Stores reference images of a person under her name, at most eight. 'only when empty' writes only while no reference exists yet — that way the first run of a series seeds the identity and every later run uses it. The image passes through unchanged.",
+    "inputs": {
+      "image": {
+        "name": "image"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      },
+      "nur_wenn_leer": {
+        "name": "only_when_empty"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "image"
+      }
+    }
+  },
   "Krea2PersonBuilder": {
     "display_name": "Photoshoot Person",
     "description": "Builds the person as English text. 'person' is always the full description; 'person_data' is the raw values as JSON for the Photoshoot, which shortens them per camera framing.",
