@@ -1,0 +1,23 @@
+[project]
+name = "comfyui-photoshoot"
+description = "Build a person once, then shoot a whole series: framing, pose, placement, expression and aspect ratio vary while the person stays the same."
+version = "2.0.9"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+
+# No runtime dependencies: the package uses only the standard library and what
+# ComfyUI already ships (folder_paths, server, aiohttp).
+dependencies = []
+
+classifiers = ["Operating System :: OS Independent"]
+
+[project.urls]
+Repository = "https://github.com/ralksta/ComfyUI-Photoshoot"
+"Bug Tracker" = "https://github.com/ralksta/ComfyUI-Photoshoot/issues"
+
+
+[tool.comfy]
+PublisherId = "ralksta"
+DisplayName = "Photoshoot"
+Icon = ""
+includes = []
