@@ -1,0 +1,14 @@
+# What does not belong in the registry package.
+#
+# tools/ and tests/ are developer tooling: they call git through subprocess,
+# open network connections to a running ComfyUI and hang modules into
+# sys.modules. None of it is needed while the node runs, and to a security
+# scanner it looks like malicious code.
+tools/
+tests/
+
+# Session leftovers
+node.zip
+
+# Not embedded in the README, saves load time on install
+docs/face.png
