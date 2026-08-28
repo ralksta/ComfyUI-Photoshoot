@@ -1,0 +1,352 @@
+{
+  "Krea2Bausteine": {
+    "display_name": "Photoshoot Pick Blocks",
+    "description": "Picks two persons, a scene and a style from the saved blocks. New entries appear only after a refresh (R).",
+    "inputs": {
+      "person_1": {
+        "name": "person_1"
+      },
+      "person_2": {
+        "name": "person_2"
+      },
+      "szene": {
+        "name": "scene"
+      },
+      "stil": {
+        "name": "style"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person_1"
+      },
+      "1": {
+        "name": "person_2"
+      },
+      "2": {
+        "name": "scene"
+      },
+      "3": {
+        "name": "style"
+      }
+    }
+  },
+  "Krea2ExpressionBuilder": {
+    "display_name": "Photoshoot Expression",
+    "description": "Composes a facial expression. Wire the output into the 'expression' input of Photoshoot Build Prompt and place it with {expression} in the text — as far forward as possible.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "expression"
+      }
+    }
+  },
+  "Krea2LichtLoad": {
+    "display_name": "Photoshoot Load Lighting",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "licht": {
+        "name": "lighting"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting"
+      }
+    }
+  },
+  "Krea2LichtSave": {
+    "display_name": "Photoshoot Save Lighting",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "licht": {
+        "name": "lighting"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting"
+      }
+    }
+  },
+  "Krea2LightingBuilder": {
+    "display_name": "Photoshoot Lighting",
+    "description": "Composes a photographic studio or ambient lighting setup. Wire the output into the 'lighting' input of Photoshoot Build Prompt and place it with {lighting} in the text.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting"
+      }
+    }
+  },
+  "Krea2PersonBuilder": {
+    "display_name": "Photoshoot Person",
+    "description": "Builds the person as English text. 'person' is always the full description; 'person_data' is the raw values as JSON for the Photoshoot, which shortens them per camera framing.",
+    "outputs": {
+      "0": {
+        "name": "person"
+      },
+      "1": {
+        "name": "person_data"
+      }
+    }
+  },
+  "Krea2PersonLoad": {
+    "display_name": "Photoshoot Load Person",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "person": {
+        "name": "person"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person"
+      }
+    }
+  },
+  "Krea2PersonSave": {
+    "display_name": "Photoshoot Save Person",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "person": {
+        "name": "person"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person"
+      }
+    }
+  },
+  "Krea2Photoshooting": {
+    "display_name": "Photoshoot Series",
+    "description": "Varies camera, pose, expression and aspect ratio across a whole series. The person is optional via 'person_data' and gets shortened per framing. 'person_data' and 'camera_label' at the end are for optional extension packs. The seed is the run counter, not the source of randomness.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      },
+      "width_in": {
+        "name": "width_in"
+      },
+      "height_in": {
+        "name": "height_in"
+      },
+      "person_data": {
+        "name": "person_data"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "pose"
+      },
+      "1": {
+        "name": "expression"
+      },
+      "2": {
+        "name": "camera"
+      },
+      "3": {
+        "name": "width"
+      },
+      "4": {
+        "name": "height"
+      },
+      "5": {
+        "name": "image_seed"
+      },
+      "6": {
+        "name": "person"
+      },
+      "7": {
+        "name": "person_data"
+      },
+      "8": {
+        "name": "camera_label"
+      }
+    }
+  },
+  "Krea2PoseBuilder": {
+    "display_name": "Photoshoot Pose",
+    "description": "Composes a body pose. Wire the output into the 'pose' input of Photoshoot Build Prompt and place it with {pose} in the text — as far forward as possible.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "pose"
+      }
+    }
+  },
+  "Krea2PromptJoin": {
+    "display_name": "Photoshoot Build Prompt",
+    "description": "Replaces {person1} {person2} {person3} {camera} {pose} {expression} {lighting} {scene} {style} {extra}. Recommended: {camera}, {scene}, {lighting}, {person}, {pose}, {extra}, {expression}, {style}. The German spellings still work. {extra} is for extension packs. Without placeholders: camera, scene and lighting before the person.",
+    "inputs": {
+      "text": {
+        "name": "text"
+      },
+      "person_1": {
+        "name": "person_1"
+      },
+      "person_2": {
+        "name": "person_2"
+      },
+      "person_3": {
+        "name": "person_3"
+      },
+      "kamera": {
+        "name": "camera"
+      },
+      "pose": {
+        "name": "pose"
+      },
+      "ausdruck": {
+        "name": "expression"
+      },
+      "licht": {
+        "name": "lighting"
+      },
+      "lighting": {
+        "name": "lighting"
+      },
+      "szene": {
+        "name": "scene"
+      },
+      "stil": {
+        "name": "style"
+      },
+      "extra": {
+        "name": "extra"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt"
+      }
+    }
+  },
+  "Krea2PromptLoad": {
+    "display_name": "Photoshoot Load Prompt",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "prompt": {
+        "name": "prompt"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt"
+      }
+    }
+  },
+  "Krea2PromptSave": {
+    "display_name": "Photoshoot Save Prompt",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "prompt": {
+        "name": "prompt"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt"
+      }
+    }
+  },
+  "Krea2StilLoad": {
+    "display_name": "Photoshoot Load Style",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "stil": {
+        "name": "style"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "style"
+      }
+    }
+  },
+  "Krea2StilSave": {
+    "display_name": "Photoshoot Save Style",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "stil": {
+        "name": "style"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "style"
+      }
+    }
+  },
+  "Krea2SzeneLoad": {
+    "display_name": "Photoshoot Load Scene",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "szene": {
+        "name": "scene"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "scene"
+      }
+    }
+  },
+  "Krea2SzeneSave": {
+    "display_name": "Photoshoot Save Scene",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "szene": {
+        "name": "scene"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "scene"
+      }
+    }
+  }
+}
