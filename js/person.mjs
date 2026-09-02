@@ -1,0 +1,750 @@
+// Interface of the Person Builder.
+//
+// Its own blueprint rather than panel.mjs, because the person is structurally
+// different: 20 fields instead of 6, spread across tabs, plus free text fields
+// and a real multiple selection. And deliberately without a seed or dice - a
+// person should stay the same across many images.
+
+import {
+  applyAdaptiveCanvasOnly,
+  injiziereCSS,
+  installCanvasZoomPassthrough,
+  ladePresets,
+  leseState,
+  registriereStateInjektion,
+  schreibeState,
+  t as uet,
+  tf as uetf,
+} from "./shared.mjs?v=2.3.0";
+
+import { app } from "../../scripts/app.js";
+
+const CLASS_TYPE = "Krea2PersonBuilder";
+const HIDDEN = "PersonState";
+const PROP = "personState";
+
+const VORGABE = {
+  felder: {},
+  mehrfach: { skinFeatures: [] },
+  texte: { ageExact: "", details: "" },
+  sektion: "Grund",
+  gruppe: { shoes: "alle" },
+};
+
+// A tab entry is either a field name or a list of fields that belong together.
+// Where only the fields themselves matter - counting, searching - the nesting is
+// of no interest.
+const flach = (eintraege) => (eintraege || []).flatMap((e) => (Array.isArray(e) ? e : [e]));
+
+function wertVon(daten, cat, label) {
+  if (!label || label === daten.leer) return null;
+  return daten.felder[cat]?.find((e) => e.label === label)?.wert ?? null;
+}
+
+// Builds the English sentence by the same rules as compose_person(): suffixes
+// on skin and eyes, hair colour into the hairstyle template, lip finish before
+// the colour, nail colour substituted into the length, "wearing" before the
+// shoes.
+function baueVorschau(daten, state) {
+  const f = state.felder || {};
+  const t = state.texte || {};
+  const w = (cat) => wertVon(daten, cat, f[cat]);
+  const teile = [];
+
+  let gen = w("gender") || w("type");
+  if (gen === "a young woman" || gen === "young woman") gen = "woman";
+  if (gen === "a young man" || gen === "young man") gen = "man";
+  if (gen === "a woman") gen = "woman";
+  if (gen === "a man") gen = "man";
+  if (gen === "a trans woman") gen = "trans woman";
+  if (gen === "a person") gen = "person";
+
+  const poss = { woman: "her", "trans woman": "her", man: "his", person: "their" }[gen] || "their";
+
+  // Mirrors MINDESTALTER in person_builder.py - the preview has to show what
+  // the prompt will actually say, not what was typed.
+  let genau = (t.ageExact || "").replace(/\D/g, "");
+  if (genau && Number(genau) < 18) genau = "18";
+  if (genau && Number(genau) > 0) {
+    const alter = Number(genau);
+    let subjekt = null;
+    if (gen === "woman") subjekt = alter < 18 ? "girl" : "woman";
+    else if (gen === "trans woman") subjekt = alter < 18 ? "trans girl" : "trans woman";
+    else if (gen === "man") subjekt = alter < 18 ? "boy" : "man";
+    else if (gen === "person") subjekt = alter < 13 ? "child" : (alter < 18 ? "teenager" : "person");
+
+    if (subjekt) {
+      const art = ("aeiou8".includes(String(alter)[0]) || [11, 18, 80].includes(alter)) ? "an" : "a";
+      teile.push(`${art} ${alter}-year-old ${subjekt}`);
+    } else {
+      teile.push(alter + " years old");
+    }
+  } else if (w("age")) {
+    const ageVal = w("age");
+    if (ageVal === "{child}") {
+      const sub = { woman: "young girl", "trans woman": "young trans girl", man: "young boy", person: "young child" }[gen] || "young child";
+      teile.push(sub.startsWith("a") || sub.startsWith("e") || sub.startsWith("i") || sub.startsWith("o") || sub.startsWith("u") ? "an " + sub : "a " + sub);
+    } else if (ageVal === "{teen}") {
+      const sub = { woman: "teenage girl", "trans woman": "teenage trans girl", man: "teenage boy", person: "teenager" }[gen] || "teenager";
+      teile.push("a " + sub);
+    } else {
+      if (gen) {
+        teile.push(gen === "woman" ? "a woman" : (gen === "trans woman" ? "a trans woman" : (gen === "man" ? "a man" : "a person")));
+      }
+      teile.push(ageVal.replace("{p}", poss));
+    }
+  } else if (gen) {
+    teile.push(gen === "woman" ? "a woman" : (gen === "trans woman" ? "a trans woman" : (gen === "man" ? "a man" : "a person")));
+  }
+
+  if (w("ethnicity")) teile.push(w("ethnicity"));
+  if (w("skinTone")) teile.push(w("skinTone") + " skin");
+  if (w("complexion")) teile.push(w("complexion"));
+
+  // Body from top to bottom - the counterweight to being head-heavy.
+  for (const cat of ["height", "figure", "shoulders", "bust", "waist",
+                     "belly", "hips", "legs"]) {
+    if (w(cat)) teile.push(w(cat));
+  }
+
+  if (w("hair")) teile.push(w("hair").replace("{c}", w("hairColor") || "").replace(/\s+/g, " ").trim());
+  else if (w("hairColor")) teile.push(w("hairColor") + " hair");
+  if (w("hairEffect")) teile.push(w("hairEffect"));
+
+  // Face from the shape inwards: contour, cheeks, nose, brows, eyes.
+  if (w("faceShape")) teile.push(w("faceShape") + " face");
+  if (w("cheekbones")) teile.push(w("cheekbones"));
+  if (w("nose")) teile.push(w("nose"));
+  if (w("chin")) teile.push(w("chin"));
+  if (w("jawline")) teile.push(w("jawline"));
+  if (w("browShape")) teile.push(w("browShape"));
+
+  // Eye shape and colour in one phrase, otherwise it would read
+  // "almond-shaped eyes, green eyes". Append the word "eyes" only when it is
+  // not already in the value - otherwise "one blue and one green eye eyes".
+  if (w("eyeShape") || w("eyes")) {
+    const satz = [w("eyeShape"), w("eyes")].filter(Boolean).join(" ");
+    teile.push(satz.includes("eye") ? satz : satz + " eyes");
+  }
+  if (w("lashes")) teile.push(w("lashes"));
+  if (w("eyeliner")) teile.push(w("eyeliner"));
+  if (w("eyeshadow")) teile.push(w("eyeshadow"));
+
+  if (w("lipShape")) teile.push(w("lipShape"));
+
+  if (w("lipColor")) teile.push([w("lipFinish"), w("lipColor"), "lipstick"].filter(Boolean).join(" "));
+  else if (w("lipFinish")) teile.push(w("lipFinish") + " lips");
+  if (w("blush")) teile.push(w("blush"));
+  if (w("makeup")) teile.push(w("makeup"));
+
+  for (const label of state.mehrfach?.skinFeatures || []) {
+    const v = wertVon(daten, "skinFeatures", label);
+    if (v && !teile.includes(v)) teile.push(v);
+  }
+
+  const nl = w("nailLength");
+  const nc = w("nailColor");
+  if (nl && nc) teile.push(nl.replace("nails", nc + " nails"));
+  else if (nl) teile.push(nl);
+  else if (nc) teile.push(nc + " nails");
+
+  const frei = (t.details || "").trim().replace(/[,;.\s]+$/, "");
+  if (frei) teile.push(frei);
+
+  // Legwear before the shoes, colour in front of it. With bare legs both drop
+  // out, otherwise it would read "wearing black bare legs".
+  const hos = w("hosiery");
+  if (hos === "bare legs") teile.push("bare legs");
+  else if (hos) teile.push("wearing " + [w("hosieryColor"), hos].filter(Boolean).join(" "));
+
+  // Shoe colour goes in front in the same way. "barefoot" and the two "no
+  // shoes" entries get none - there is nothing to colour there. Has to match
+  // SCHUHE_OHNE in person_builder.py, or the preview shows something other than
+  // what comes out later.
+  const OHNE = ["barefoot", "only sheer stockings, no shoes", "only socks, no shoes"];
+  const schuhe = w("shoes");
+  if (OHNE.includes(schuhe)) teile.push(schuhe);
+  else if (schuhe) teile.push("wearing " + [w("shoesColor"), schuhe].filter(Boolean).join(" "));
+
+  for (const cat of ["jewellery", "eyewear", "headwear"]) {
+    if (w(cat)) teile.push("wearing " + w(cat));
+  }
+
+  return teile.join(", ");
+}
+
+function _zufall(arr) {
+  if (!arr || !arr.length) return null;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function wuerflePersona(daten, stateAktuell) {
+  const f = {};
+  const t = { ageExact: "", details: "" };
+  const m = { skinFeatures: [] };
+
+  const valid = (cat, label) => {
+    return daten.felder?.[cat]?.some((e) => e.label === label) ? label : daten.leer;
+  };
+
+  // 1. Gender
+  const genPool = ["Frau", "Frau", "Frau", "Mann", "Mann", "Transfrau", "Person"];
+  const gender = _zufall(genPool);
+  f.gender = valid("gender", gender);
+
+  // 2. Age (20s to 50s)
+  const agePool = [
+    "Anfang 20", "Mitte 20", "Ende 20", "Anfang 30", "Mitte 30", "Ende 30", "40er", "50er"
+  ];
+  f.age = valid("age", _zufall(agePool));
+
+  // 3. Coherent Ethnicity Archetypes
+  const archetypes = [
+    {
+      ethnicity: "Skandinavisch",
+      skinTone: ["Sehr hell", "Hell", "Kühles Porzellan"],
+      complexion: ["Natürliche Poren", "Zarter Glanz", "Frisch & taufrisch"],
+      hairColor: ["Honigblond", "Platinblond", "Aschblond", "Rot / Kupfer", "Hellbraun"],
+      eyes: ["Eisblau", "Helles Blau", "Graugrün", "Klares Grün", "Graublau"],
+      hairF: ["Lange Wellen", "Beach Waves", "Lange glatte Haare", "Curtain Bangs", "Messy Bun"],
+      hairM: ["Mittellang strukturiert", "Klassischer Seitenscheitel", "Kurzer Fade Cut"],
+      features: ["Sommersprossen"],
+      featuresChance: 0.35,
+    },
+    {
+      ethnicity: "Mediterran",
+      skinTone: ["Hell gebräunt", "Gebräunt", "Oliv"],
+      complexion: ["Natürliche Poren", "Zarter Glanz", "Satin Finish"],
+      hairColor: ["Warmes Schokobraun", "Dunkelbraun", "Schwarzbraun", "Kastanienbraun"],
+      eyes: ["Warmes Braun", "Dunkelbraun", "Haselnuss", "Bernstein"],
+      hairF: ["Voluminöse Locken", "Lange Wellen", "Schulterlang gestuft", "Sanfte Wellen"],
+      hairM: ["Lockiges Deckhaar", "Messy Crop", "Klassischer Seitenscheitel"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Osteuropäisch",
+      skinTone: ["Sehr hell", "Hell", "Hell gebräunt"],
+      complexion: ["Matte Textur", "Natürliche Poren", "Feine Textur"],
+      hairColor: ["Dunkelblond", "Aschbraun", "Kastanienbraun", "Schwarzbraun"],
+      eyes: ["Eisblau", "Graublau", "Graugrün", "Dunkelbraun"],
+      hairF: ["Lange glatte Haare", "Lange Wellen", "Kurzer Bob", "Long Bob"],
+      hairM: ["Undercut", "Kurzer Fade Cut", "Slicked Back"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Nahöstlich",
+      skinTone: ["Hell gebräunt", "Gebräunt", "Oliv", "Warmes Gold"],
+      complexion: ["Natürliche Poren", "Satin Finish", "Zarter Glanz"],
+      hairColor: ["Tiefschwarz", "Schwarz", "Schwarzbraun"],
+      eyes: ["Dunkelbraun", "Tiefbraun", "Haselnuss"],
+      hairF: ["Lange Wellen", "Voluminöse Locken", "Lange glatte Haare"],
+      hairM: ["Klassischer Seitenscheitel", "Kurzer Fade Cut", "Messy Crop"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Ostasiatisch",
+      skinTone: ["Sehr hell", "Hell", "Kühles Porzellan", "Warmes Gold"],
+      complexion: ["Frisch & taufrisch", "Gleichmäßig", "Natürliche Poren"],
+      hairColor: ["Tiefschwarz", "Schwarz", "Schwarzbraun"],
+      eyes: ["Dunkelbraun", "Schwarzbraun"],
+      hairF: ["Lange glatte Haare", "Kurzer Bob", "Curtain Bangs", "Pixie Cut"],
+      hairM: ["Undercut", "Messy Crop", "Klassischer Seitenscheitel"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Südasiatisch",
+      skinTone: ["Gebräunt", "Braun", "Tiefbraun", "Hell gebräunt"],
+      complexion: ["Zarter Glanz", "Natürliche Poren", "Satin Finish"],
+      hairColor: ["Tiefschwarz", "Schwarz"],
+      eyes: ["Dunkelbraun", "Tiefbraun", "Haselnuss"],
+      hairF: ["Lange glatte Haare", "Lange Wellen", "Voluminöse Locken"],
+      hairM: ["Klassischer Seitenscheitel", "Kurzer Fade Cut"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Afrikanisch",
+      skinTone: ["Braun", "Tiefbraun", "Warmes Ebenholz", "Dunkles Espresso"],
+      complexion: ["Zarter Glanz", "Natürliche Poren", "Satin Finish"],
+      hairColor: ["Tiefschwarz", "Schwarz"],
+      eyes: ["Dunkelbraun", "Tiefbraun"],
+      hairF: ["Afro", "Braids / Zöpfe", "Kurze Twists", "Buzz Cut"],
+      hairM: ["Kurze Twists", "Fade Cut", "Buzz Cut", "Afro"],
+      features: [],
+      featuresChance: 0,
+    },
+    {
+      ethnicity: "Latina",
+      skinTone: ["Hell gebräunt", "Gebräunt", "Warmes Gold", "Oliv"],
+      complexion: ["Zarter Glanz", "Natürliche Poren", "Frisch & taufrisch"],
+      hairColor: ["Warmes Schokobraun", "Kastanienbraun", "Schwarz"],
+      eyes: ["Warmes Braun", "Haselnuss", "Bernstein", "Dunkelbraun"],
+      hairF: ["Lange Wellen", "Beach Waves", "Voluminöse Locken"],
+      hairM: ["Lockiges Deckhaar", "Kurzer Fade Cut", "Messy Crop"],
+      features: [],
+      featuresChance: 0,
+    },
+  ];
+
+  const arch = _zufall(archetypes);
+  f.ethnicity = valid("ethnicity", arch.ethnicity);
+  f.skinTone = valid("skinTone", _zufall(arch.skinTone));
+  f.complexion = valid("complexion", _zufall(arch.complexion));
+  f.hairColor = valid("hairColor", _zufall(arch.hairColor));
+  f.eyes = valid("eyes", _zufall(arch.eyes));
+
+  const isMann = gender === "Mann";
+  const hairPool = isMann ? arch.hairM : arch.hairF;
+  f.hair = valid("hair", _zufall(hairPool));
+
+  // 4. Figure & Body
+  f.height = valid("height", _zufall(["Mittelgroß", "Groß", "Zierlich"]));
+  const figures = isMann
+    ? ["Athletisch", "Sportlich", "Definiert", "Schlank", "Muskulös"]
+    : ["Athletisch", "Schlank", "Sanduhr", "Sportlich", "Kurvig", "Definiert"];
+  f.figure = valid("figure", _zufall(figures));
+  f.shoulders = valid("shoulders", _zufall(["Sportlich", "Natürlich", "Schmal", "Definiert"]));
+
+  // 5. Facial structure
+  f.cheekbones = valid("cheekbones", _zufall(["Hoch betont", "Markant", "Sanft", "Definiert"]));
+  f.nose = valid("nose", _zufall(["Gerade", "Fein", "Klassisch", "Leichter Schwung"]));
+  f.eyeShape = valid("eyeShape", _zufall(["Mandelförmig", "Offener Blick", "Groß & rund", "Katzenaugen"]));
+
+  // 6. Makeup (if female / trans female)
+  if (!isMann && Math.random() > 0.35) {
+    f.lipColor = valid("lipColor", _zufall(["Nude", "Altrosa", "Rosenholz", "Warmes Koralle"]));
+    f.lipFinish = valid("lipFinish", _zufall(["Matt", "Satin", "Soft Tint"]));
+    if (Math.random() > 0.5) {
+      f.eyeshadow = valid("eyeshadow", _zufall(["Natürliche Nudetöne", "Warmes Taupe", "Champagner Glow"]));
+    }
+  }
+
+  // 7. Skin Features
+  if (arch.featuresChance && Math.random() < arch.featuresChance) {
+    m.skinFeatures = arch.features.filter((feat) =>
+      daten.felder?.skinFeatures?.some((e) => e.label === feat)
+    );
+  }
+
+  // 8. Shoes
+  const shoesList = isMann
+    ? ["Sneaker", "Combat Boots", "Loafer"]
+    : ["Combat Boots", "Sneaker", "Loafer", "Stiefeletten mit Absatz", "Ballerinas", "Riemchen-Sandaletten", "Stiletto High Heels"];
+  f.shoes = valid("shoes", _zufall(shoesList));
+  f.shoesColor = valid("shoesColor", _zufall(["Schwarz", "Weiß", "Cognac / Braun", "Nude"]));
+
+  // 9. Editorial Fashion Details
+  const outfits = [
+    "wearing a charcoal wool coat over a minimal top",
+    "wearing an oversized beige cashmere sweater and tailored trousers",
+    "wearing a crisp white cotton shirt with rolled-up sleeves",
+    "wearing a structured black tailored blazer",
+    "wearing a relaxed cream linen shirt",
+    "wearing a classic trench coat over a dark turtleneck",
+    "wearing a vintage brown leather jacket and minimalist tee",
+    "wearing a clean silk slip top in muted tones",
+  ];
+  t.details = _zufall(outfits);
+
+  return {
+    ...stateAktuell,
+    felder: f,
+    texte: t,
+    mehrfach: m,
+  };
+}
+
+function baue(node, daten) {
+  injiziereCSS();
+
+  const root = document.createElement("div");
+  root.className = "k2-root";
+  installCanvasZoomPassthrough(root);
+
+  const lies = () => {
+    const s = leseState(node, PROP, VORGABE);
+    if (s.felder && s.felder.type && !s.felder.gender) {
+      if (s.felder.type === "Junge Frau") {
+        s.felder.gender = "Frau";
+        if (!s.felder.age || s.felder.age === daten.leer) s.felder.age = "Anfang 20";
+      } else if (s.felder.type === "Junger Mann") {
+        s.felder.gender = "Mann";
+        if (!s.felder.age || s.felder.age === daten.leer) s.felder.age = "Anfang 20";
+      } else {
+        s.felder.gender = s.felder.type;
+      }
+      delete s.felder.type;
+    }
+    return s;
+  };
+  const schreib = (s) => {
+    nachfrage = false;   // any other change withdraws the confirmation
+    schreibeState(node, PROP, s);
+    zeichne();
+  };
+  const name = (cat) => uet(daten.namen?.[cat] || cat, "feldnamen");
+
+  // Confirmation before clearing all fields. Deliberately kept here and not in
+  // the state - a half-asked question does not belong in the saved workflow, and
+  // it should be gone the next time the node is opened.
+  let nachfrage = false;
+
+  // Just a field's dropdown, without a label - row groups put several of them
+  // side by side under one shared label. "erlaubt" narrows the selection (for
+  // shoes: the chosen family).
+  function selectFuer(state, cat, erlaubt) {
+    const sel = document.createElement("select");
+    const leer = document.createElement("option");
+    leer.value = daten.leer;
+    leer.textContent = daten.leer;
+    sel.append(leer);
+    for (const e of daten.felder[cat] || []) {
+      if (erlaubt && !erlaubt.includes(e.label)) continue;
+      const o = document.createElement("option");
+      o.value = e.label;
+      o.textContent = uet(e.label, "person/" + cat);
+      o.title = e.wert;
+      sel.append(o);
+    }
+    const gesetzt = state.felder?.[cat] || daten.leer;
+    // If the value there fell through the filter, the dropdown would be empty
+    // and would silently jump to the first entry on the next write. So make it
+    // visible instead.
+    if (gesetzt !== daten.leer && !Array.from(sel.options).some((o) => o.value === gesetzt)) {
+      const o = document.createElement("option");
+      o.value = gesetzt;
+      o.textContent = uet(gesetzt, "person/" + cat);
+      sel.append(o);
+    }
+    sel.value = gesetzt;
+    sel.onchange = () =>
+      schreib({ ...state, felder: { ...state.felder, [cat]: sel.value } });
+    return sel;
+  }
+
+  // A label that resets on click. You used to have to open the dropdown and
+  // scroll all the way to the top to get rid of a field again.
+  function beschriftung(state, text, cats) {
+    const lbl = document.createElement("div");
+    lbl.className = "k2-name k2-loeschbar";
+    lbl.textContent = text;
+    lbl.title = uet(
+      cats.length > 1 ? "Klicken setzt diese Felder zurück" : "Klicken setzt dieses Feld zurück",
+      "ui");
+    lbl.onclick = () => {
+      const felder = { ...state.felder };
+      for (const c of cats) felder[c] = daten.leer;
+      schreib({ ...state, felder });
+    };
+    return lbl;
+  }
+
+  function feldSelect(state, cat) {
+    const zeile = document.createElement("div");
+    zeile.className = "k2-feld";
+    zeile.append(beschriftung(state, name(cat), [cat]), selectFuer(state, cat));
+    return zeile;
+  }
+
+  // Several related fields in one row. Two dropdowns fit next to the label;
+  // shoes need three, for family, model and colour, and get the label above them
+  // - inline there would be 74 pixels left for each, too little for "stiletto
+  // high heels".
+  function feldGruppe(state, cats) {
+    // The row name comes from the server in German, like every other label,
+    // and needs the same trip through the field-name table as name() takes.
+    const zeilenname = daten.zeilennamen?.[cats[0]];
+    const titel = zeilenname ? uet(zeilenname, "feldnamen") : name(cats[0]);
+    const mitFamilie = daten.art?.[cats[0]] === "familie";
+
+    const listen = [];
+    let erlaubt = null;
+    if (mitFamilie) {
+      const gruppen = daten.gruppen?.[cats[0]] || {};
+      const aktiv = state.gruppe?.[cats[0]] || daten.alle;
+      const fam = document.createElement("select");
+      for (const g of [daten.alle, ...Object.keys(gruppen)]) {
+        const o = document.createElement("option");
+        o.value = g;
+        o.textContent = g === daten.alle ? uet("alle", "ui") : uet(g, "familien");
+        fam.append(o);
+      }
+      fam.value = aktiv;
+      fam.onchange = () =>
+        schreib({ ...state, gruppe: { ...state.gruppe, [cats[0]]: fam.value } });
+      listen.push(fam);
+      if (aktiv !== daten.alle) erlaubt = gruppen[aktiv] || [];
+    }
+    for (const c of cats) listen.push(selectFuer(state, c, c === cats[0] ? erlaubt : null));
+
+    if (listen.length <= 2) {
+      const zeile = document.createElement("div");
+      zeile.className = "k2-feld";
+      zeile.append(beschriftung(state, titel, cats), ...listen);
+      return zeile;
+    }
+    const block = document.createElement("div");
+    block.className = "k2-block";
+    const reihe = document.createElement("div");
+    reihe.className = "k2-reihe";
+    reihe.append(...listen);
+    block.append(beschriftung(state, titel, cats), reihe);
+    return block;
+  }
+
+  function feldText(state, cat) {
+    const zeile = document.createElement("div");
+    zeile.className = "k2-feld";
+    const lbl = document.createElement("div");
+    lbl.className = "k2-name k2-loeschbar";
+    lbl.textContent = name(cat);
+    lbl.title = uet("Klicken leert dieses Feld", "ui");
+    lbl.onclick = () => schreib({ ...state, texte: { ...state.texte, [cat]: "" } });
+    const inp = document.createElement("input");
+    inp.placeholder = uet(daten.platzhalter?.[cat] || "", "platzhalter");
+    inp.value = state.texte?.[cat] || "";
+    // Write only on change - otherwise the canvas redraws on every keystroke
+    // and the node flickers.
+    inp.onchange = () =>
+      schreib({ ...state, texte: { ...state.texte, [cat]: inp.value } });
+    zeile.append(lbl, inp);
+    return zeile;
+  }
+
+  function feldMehrfach(state, cat) {
+    const block = document.createElement("div");
+    block.className = "k2-block";
+    const lbl = document.createElement("div");
+    lbl.className = "k2-name k2-loeschbar";
+    lbl.textContent = name(cat);
+    lbl.title = uet("Klicken wählt alle ab", "ui");
+    lbl.onclick = () => schreib({ ...state, mehrfach: { ...state.mehrfach, [cat]: [] } });
+    const chips = document.createElement("div");
+    chips.className = "k2-chips";
+    const gewaehlt = state.mehrfach?.[cat] || [];
+    for (const e of daten.felder[cat] || []) {
+      const c = document.createElement("div");
+      const an = gewaehlt.includes(e.label);
+      c.className = "k2-chip" + (an ? " k2-an" : "");
+      c.textContent = uet(e.label, "person/" + cat);
+      c.title = e.wert;
+      c.onclick = () => {
+        const neu = an ? gewaehlt.filter((x) => x !== e.label) : [...gewaehlt, e.label];
+        schreib({ ...state, mehrfach: { ...state.mehrfach, [cat]: neu } });
+      };
+      chips.append(c);
+    }
+    block.append(lbl, chips);
+    return block;
+  }
+
+  // How many fields of a tab are set. With 44 fields across six tabs there is
+  // otherwise no way to find out where something is set, short of clicking
+  // through every tab.
+  function zaehle(state, sektion) {
+    let n = 0;
+    for (const cat of flach(sektion.felder)) {
+      const art = daten.art?.[cat] || "select";
+      if (art === "text") {
+        if ((state.texte?.[cat] || "").trim()) n++;
+      } else if (art === "mehrfach") {
+        if ((state.mehrfach?.[cat] || []).length) n++;
+      } else if (state.felder?.[cat] && state.felder[cat] !== daten.leer) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  function zeichne() {
+    const state = lies();
+    root.textContent = "";
+
+    // --- tabs ----------------------------------------------------------------
+    const tabs = document.createElement("div");
+    tabs.className = "k2-tabs";
+    const aktiv = daten.sektionen.some((s) => s.name === state.sektion)
+      ? state.sektion
+      : daten.sektionen[0].name;
+    for (const s of daten.sektionen) {
+      const tab = document.createElement("div");
+      tab.className = "k2-tab" + (s.name === aktiv ? " k2-an" : "");
+      tab.textContent = uet(s.name, "sektionen");
+      const n = zaehle(state, s);
+      if (n) {
+        const z = document.createElement("sup");
+        z.className = "k2-zahl";
+        z.textContent = String(n);
+        tab.append(z);
+      }
+      tab.title = n
+        ? uetf(n === 1 ? "{0} Feld gesetzt" : "{0} Felder gesetzt", "ui", n)
+        : uet("nichts gesetzt", "ui");
+      tab.onclick = () => schreib({ ...state, sektion: s.name });
+      tabs.append(tab);
+    }
+    root.append(tabs);
+
+    // --- fields of the active tab --------------------------------------------
+    // An entry is either a field name or a list of related fields, which then
+    // share a single row.
+    const blatt = document.createElement("div");
+    blatt.className = "k2-blatt";
+    const sektion = daten.sektionen.find((s) => s.name === aktiv);
+    for (const eintrag of sektion.felder) {
+      if (Array.isArray(eintrag)) {
+        blatt.append(feldGruppe(state, eintrag));
+        continue;
+      }
+      const art = daten.art?.[eintrag] || "select";
+      if (art === "text") blatt.append(feldText(state, eintrag));
+      else if (art === "mehrfach") blatt.append(feldMehrfach(state, eintrag));
+      else blatt.append(feldSelect(state, eintrag));
+    }
+    root.append(blatt);
+
+    // --- warning when there are too many face fields ------------------------
+    // Measured: at 4 fields a clean full-body shot, at 12 the composition
+    // collapses. Not a gradual degradation but a tipping point - hence a notice
+    // here rather than a silent decline in quality.
+    const gesetzt = (daten.gesichtsFelder || []).filter(
+      (c) => state.felder?.[c] && state.felder[c] !== daten.leer,
+    ).length;
+    if (gesetzt >= (daten.gesichtHinweisAb ?? 6)) {
+      const warn = document.createElement("div");
+      warn.className = "k2-name";
+      const arg = gesetzt >= (daten.gesichtWarnungAb ?? 9);
+      warn.style.color = arg ? "#f66744" : "#a0a0a0";
+      warn.style.whiteSpace = "normal";
+      const kopfteil = `${gesetzt} ${uet("Gesichtsfelder", "ui")} — `;
+      warn.textContent = arg
+        ? "\u26a0 " + kopfteil +
+          uet("bei Ganzkörper und Totale kippt die Komposition, der Kopf wird zu groß", "ui")
+        : kopfteil + uet("für weite Einstellungen reichen vier bis fünf", "ui");
+      warn.title =
+        uet("Bildmodelle verteilen die Bildfläche ungefähr nach der Gewichtung im ", "ui") +
+        uet("Prompt. Viele Gesichtsangaben überstimmen den Hinweis auf die ", "ui") +
+        uet("Proportionen. Für Porträts und Nahaufnahmen ist es unkritisch.", "ui");
+      root.append(warn);
+    }
+
+    // --- actions & reset bar -------------------------------------------------
+    {
+      const zeile = document.createElement("div");
+      zeile.className = "k2-reset";
+
+      // Left: Inspire Me button
+      const inspireBtn = document.createElement("span");
+      inspireBtn.className = "k2-inspire-btn";
+      inspireBtn.textContent = "🎲 " + uet("Inspire Me", "ui");
+      inspireBtn.title = uet("Stimmige Person auswürfeln", "ui");
+      inspireBtn.onclick = () => {
+        const neu = wuerflePersona(daten, state);
+        schreib(neu);
+      };
+      zeile.append(inspireBtn);
+
+      // Right: Reset buttons
+      const rechts = document.createElement("div");
+      rechts.className = "k2-reset-gruppe";
+
+      const dieses = zaehle(state, sektion);
+      const gesamt = daten.sektionen.reduce((n, s) => n + zaehle(state, s), 0);
+
+      const knopf = (text, titel, tun) => {
+        const k = document.createElement("span");
+        k.className = "k2-reset-knopf";
+        k.textContent = text;
+        k.title = titel;
+        k.onclick = tun;
+        return k;
+      };
+
+      if (dieses) {
+        rechts.append(knopf(`⟲ ${uet(aktiv, "sektionen")} (${dieses})`,
+          uetf("Die {0} gesetzten Felder dieser Karte zurücksetzen", "ui", dieses), () => {
+            const felder = { ...state.felder }, texte = { ...state.texte },
+                  mehrfach = { ...state.mehrfach };
+            for (const cat of flach(sektion.felder)) {
+              const art = daten.art?.[cat] || "select";
+              if (art === "text") texte[cat] = "";
+              else if (art === "mehrfach") mehrfach[cat] = [];
+              else felder[cat] = daten.leer;
+            }
+            schreib({ ...state, felder, texte, mehrfach });
+          }));
+      }
+      if (gesamt) {
+        rechts.append(nachfrage
+          ? knopf(uetf("wirklich alle {0} löschen?", "ui", gesamt),
+                  uet("Nochmal klicken bestätigt", "ui"), () => {
+              nachfrage = false;
+              schreib({ ...VORGABE, felder: {}, mehrfach: { skinFeatures: [] },
+                        texte: { ageExact: "", details: "" },
+                        sektion: aktiv, gruppe: { shoes: daten.alle } });
+            })
+          : knopf(`⟲ ${uet("alles", "ui")} (${gesamt})`,
+                  uet("Alle Felder des Nodes zurücksetzen", "ui"), () => {
+              nachfrage = true;
+              zeichne();
+            }));
+      }
+      zeile.append(rechts);
+      root.append(zeile);
+    }
+
+    // --- live preview --------------------------------------------------------
+    const v = document.createElement("div");
+    const text = baueVorschau(daten, state);
+    v.className = "k2-vorschau k2-lang" + (text ? "" : " k2-leer");
+    v.textContent = text || uet("nichts gewählt", "ui");
+    root.append(v);
+  }
+
+  queueMicrotask(zeichne);
+  node._k2Zeichne = zeichne;
+
+  // The height follows the node, see shooting.mjs.
+  const CHROM = 48;
+  const w = node.addDOMWidget("k2_person", "custom", root, {
+    getValue: () => node.properties?.[PROP],
+    setValue: () => {},
+    getMinHeight: () => 240,
+    getMaxHeight: () => Math.max(240, (node.size?.[1] || 400) - CHROM),
+    margin: 4,
+    serialize: false,
+  });
+  applyAdaptiveCanvasOnly(w);
+}
+
+registriereStateInjektion(CLASS_TYPE, HIDDEN, PROP, VORGABE);
+
+app.registerExtension({
+  name: "Krea2." + CLASS_TYPE,
+
+  async beforeRegisterNodeDef(nodeType, nodeData) {
+    if (nodeData.name !== CLASS_TYPE) return;
+    const orig = nodeType.prototype.onConfigure;
+    nodeType.prototype.onConfigure = function () {
+      const r = orig?.apply(this, arguments);
+      queueMicrotask(() => this._k2Zeichne?.());
+      return r;
+    };
+  },
+
+  async nodeCreated(node) {
+    if (node.comfyClass !== CLASS_TYPE) return;
+    const presets = await ladePresets();
+    if (!presets?.person) return;
+    // The largest tab is make-up at around 206 px; plus tabs, warning,
+    // preview, title and output. Only for new nodes - onConfigure restores the
+    // saved size for stored workflows.
+    node.size = [340, 420];
+    baue(node, presets.person);
+  },
+});
+

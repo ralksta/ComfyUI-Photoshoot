@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Editor and tooling state
+.claude/
+.vscode/
+.idea/
+
+# Smoke test scratch directory
+tests/_tmp/
+
+# Package produced by "comfy node pack"
+node.zip
+
+# Local model names and the runnable copy of the example workflow they build.
+# The shipped workflow names what Comfy-Org publishes; these stay on this
+# machine so local names can never reach a commit.
+tools/modelle.local.json
+example_workflows/*.local.json
+example_workflows/*.local.jpg
