@@ -1,0 +1,130 @@
+{
+  "_comment": [
+    "Photoshoot custom entries - an example with one entry per case.",
+    "",
+    "JSON has no comments, so every explanation sits in a key starting with an",
+    "underscore (_comment). Photoshoot reads only the keys it knows and skips",
+    "the rest, so this file loads as it is.",
+    "",
+    "HOW TO USE IT",
+    "1. Copy this file into ComfyUI/user/krea2_presets/ and give it a name",
+    "   ending in .json (a file ending in .txt is not read).",
+    "2. Restart ComfyUI, then reload the browser tab.",
+    "3. The entries show up in the lists of the Person, Wardrobe, Pose,",
+    "   Expression, Lighting and Style nodes, next to the built-in ones.",
+    "",
+    "Every file in that folder is read; use as many as you like. An entry",
+    "that breaks a rule is skipped with a message in the ComfyUI console, and",
+    "the rest of the file still loads. Nothing you do here can change a",
+    "built-in entry.",
+    "",
+    "FIELD NAMES: open http://127.0.0.1:8188/krea2/custom/template in the",
+    "browser. It lists every built-in entry in this very format, so you can",
+    "see which fields exist and copy the style of the prompts."
+  ],
+
+  "format": "photoshoot-presets/1",
+  "name": "Example",
+
+  "_comment_dice": [
+    "dice: true lets the entries of this file into the dice and the Series",
+    "pools. Leave it false and an entry is only used when you pick it, so",
+    "every seed you already know rolls exactly what it rolled before."
+  ],
+  "dice": false,
+
+  "entries": [
+    {
+      "_comment": "The minimum: field, label, prompt. 'builder' defaults to person (Person and Wardrobe). No group, so it goes under Custom.",
+      "field": "headwear",
+      "label": "Trilby",
+      "prompt": "a narrow-brimmed straw trilby"
+    },
+    {
+      "_comment": "Sorted into an existing family. The family can be named as the English interface shows it ('Hats') or by its German key ('Hüte').",
+      "field": "headwear",
+      "label": "Glitzer-Haarspange",
+      "en": "Glitter hair clip",
+      "group": "hair accessories & scarves",
+      "prompt": "a sparkling rhinestone hair clip above one ear"
+    },
+    {
+      "_comment": "The label is what the list shows and what the workflow saves; 'en' is the name in the English interface. Here a German label with an English display name.",
+      "field": "top",
+      "label": "Korsage mit Cape",
+      "en": "Corset top with cape",
+      "group": "tops & blouses",
+      "prompt": "a structured corset top with a short sheer chiffon cape over the shoulders"
+    },
+    {
+      "_comment": "A group name that does not exist yet becomes a new family of its own.",
+      "field": "bottom",
+      "label": "Reifrock",
+      "en": "Hoop skirt",
+      "group": "Costume",
+      "prompt": "floor-length hoop skirt with a wide bell shape"
+    },
+    {
+      "_comment": "A colour field: the prompt is the colour word, 'hex' the swatch in the palette. Without hex the swatch is grey. The colour appears in every colour field of its kind only if you add it to each (topColor, bottomColor, shoesColor, ...).",
+      "field": "topColor",
+      "label": "Petrol",
+      "hex": "#0f5e6b",
+      "prompt": "petrol blue"
+    },
+    {
+      "_comment": "Hairstyles may use {c}: the hair colour from its own field goes there. No other placeholder is allowed anywhere.",
+      "field": "hair",
+      "label": "Shag",
+      "prompt": "a choppy layered {c} shag cut with feathered ends"
+    },
+    {
+      "_comment": "Another node: 'builder' is pose, expression, lighting or style. A pose with no coupling of its own: arms, legs and placement are not narrowed down for it.",
+      "builder": "pose",
+      "field": "haltung",
+      "label": "Auf einer Treppenstufe sitzend",
+      "en": "Sitting on a stair step",
+      "group": "sitting",
+      "prompt": "sitting on a stair step, knees drawn up"
+    },
+    {
+      "_comment": "A mood for the Expression node, sorted into the 'friendly' family.",
+      "builder": "expression",
+      "field": "stimmung",
+      "label": "Spitzbübisch grinsend",
+      "en": "Impish grin",
+      "group": "friendly",
+      "prompt": "an impish, lopsided grin"
+    },
+    {
+      "_comment": "A light setup in the 'mood' family of the Lighting node.",
+      "builder": "lighting",
+      "field": "setup",
+      "label": "Neonröhre",
+      "en": "Bare neon tube",
+      "group": "mood",
+      "prompt": "a single bare fluorescent neon tube as the only light, cold green-white cast"
+    },
+    {
+      "_comment": "A look for the Style node, in the colour family. Tip: the built-in looks are written as what they look like, not by film name - a film name alone did little in the render tests.",
+      "builder": "style",
+      "field": "look",
+      "label": "Superia abgelaufen",
+      "en": "Expired Superia",
+      "group": "colour",
+      "prompt": "shot on expired Fuji Superia film, warm colour cast, soft halation, faded blacks"
+    }
+  ],
+
+  "_comment_rules": [
+    "What is refused (skipped with a message, the rest loads):",
+    "- a label a built-in entry of that field already has - the built-in one stays",
+    "- the same label twice for one field, across all files - the first one stays",
+    "- the fields age and gender - they cannot be extended",
+    "- an empty label or prompt, a label over 60 or a prompt over 300 characters",
+    "- a placeholder other than {c} in hair",
+    "- a field or builder that does not exist",
+    "",
+    "A workflow remembers the prompt of every custom entry it uses. Shared with",
+    "someone who does not have this file, it still renders the same."
+  ]
+}

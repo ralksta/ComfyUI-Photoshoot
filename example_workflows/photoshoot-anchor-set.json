@@ -1,0 +1,1496 @@
+{
+  "id": "krea2-photoshoot-example",
+  "revision": 0,
+  "last_node_id": 96,
+  "last_link_id": 31,
+  "nodes": [
+    {
+      "id": 90,
+      "type": "MarkdownNote",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        340,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Models.** Krea 2 Turbo, its text encoder and VAE. The **LoRA** below is optional: pick your character LoRA, then Ctrl+B to switch it on."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "title": "Krea 2 model",
+      "widgets_values": [
+        "krea2_turbo_fp8_scaled.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        40,
+        340
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "qwen3vl_4b_fp8_scaled.safetensors",
+        "krea2",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        480
+      ],
+      "size": [
+        340,
+        90
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "qwen_image_vae.safetensors"
+      ]
+    },
+    {
+      "id": 91,
+      "type": "MarkdownNote",
+      "pos": [
+        460,
+        60
+      ],
+      "size": [
+        880,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Who.** Build the person once and save her. Her clothes come from the **Wardrobe** on the left: outfits as tabs - she wears the open one, and the series changes through all of them."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 13,
+      "type": "Krea2Wardrobe",
+      "pos": [
+        460,
+        200
+      ],
+      "size": [
+        400,
+        330
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "garderobe",
+          "type": "STRING",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Wardrobe",
+        "wardrobeState": "{\"outfits\": [{\"id\": \"mantel\", \"name\": \"Coat\", \"texte\": {\"details\": \"wearing a charcoal wool coat\"}, \"felder\": {\"hosiery\": \"Nackte Beine\", \"shoes\": \"Combat Boots\", \"shoesColor\": \"Schwarz\"}}], \"aktiv\": 0, \"sektion\": null, \"vorschauArt\": \"puppe\"}"
+      }
+    },
+    {
+      "id": 10,
+      "type": "Krea2PersonBuilder",
+      "pos": [
+        900,
+        200
+      ],
+      "size": [
+        440,
+        430
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "garderobe",
+          "type": "STRING",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "person",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 0
+        },
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "links": [
+            6
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2PersonBuilder",
+        "personState": "{\"felder\": {\"gender\": \"Frau\", \"age\": \"Ende 20\", \"ethnicity\": \"Skandinavisch\", \"skinTone\": \"Sehr hell\", \"complexion\": \"Natürliche Poren\", \"height\": \"Groß\", \"figure\": \"Athletisch\", \"shoulders\": \"Sportlich\", \"hair\": \"Lange Wellen\", \"hairColor\": \"Rot / Kupfer\", \"eyeShape\": \"Mandelförmig\", \"eyes\": \"Graugrün\", \"cheekbones\": \"Hoch betont\", \"nose\": \"Gerade\", \"lipColor\": \"Altrosa\", \"lipFinish\": \"Matt\"}, \"mehrfach\": {\"skinFeatures\": [\"Sommersprossen\"]}, \"texte\": {\"ageExact\": \"\", \"details\": \"\"}, \"sektion\": null, \"gruppe\": {\"shoes\": \"alle\"}}"
+      }
+    },
+    {
+      "id": 92,
+      "type": "MarkdownNote",
+      "pos": [
+        1420,
+        60
+      ],
+      "size": [
+        400,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Look.** Scene, light and style stay the same for the whole series. **Black & white?** Pick it under *Look* in the style node, then switch on *Monochrome* in step 6 (Ctrl+B)."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 20,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        1420,
+        200
+      ],
+      "size": [
+        400,
+        140
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "title": "scene",
+      "widgets_values": [
+        "a sunlit loft with tall windows, wooden floor, plants in the corner"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "Krea2LightingBuilder",
+      "pos": [
+        1420,
+        380
+      ],
+      "size": [
+        400,
+        280
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "licht",
+          "type": "STRING",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2LightingBuilder",
+        "lightingState": "{\"felder\": {\"setup\": \"Softbox diffuses Licht\", \"richtung\": \"Frontal 45°\", \"atmosphaere\": \"Klar & gestochen scharf\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}"
+      },
+      "widgets_values": [
+        0,
+        "fixed"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Krea2StyleBuilder",
+      "pos": [
+        1420,
+        710
+      ],
+      "size": [
+        400,
+        320
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "stil",
+          "type": "STRING",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2StyleBuilder",
+        "styleState": "{\"felder\": {\"look\": \"—\", \"genre\": \"Editorial\", \"optik\": \"85mm f/1.4\", \"finish\": \"—\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}"
+      },
+      "widgets_values": [
+        0,
+        "fixed"
+      ]
+    },
+    {
+      "id": 93,
+      "type": "MarkdownNote",
+      "pos": [
+        1900,
+        60
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**The shoot.** Six reference images of one person: one seed, a fixed ratio, calm moods, so everything the text leaves open is invented once. Press **Start shooting** inside the node."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 11,
+      "type": "Krea2Photoshooting",
+      "pos": [
+        1900,
+        200
+      ],
+      "size": [
+        440,
+        960
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "link": 6,
+          "widget": {
+            "name": "person_data"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pose",
+          "type": "STRING",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "ausdruck",
+          "type": "STRING",
+          "links": [
+            10
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "kamera",
+          "type": "STRING",
+          "links": [
+            11
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            12
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            13
+          ],
+          "slot_index": 4
+        },
+        {
+          "name": "bildseed",
+          "type": "INT",
+          "links": [
+            14,
+            15
+          ],
+          "slot_index": 5
+        },
+        {
+          "name": "person",
+          "type": "STRING",
+          "links": [
+            8
+          ],
+          "slot_index": 6
+        },
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 7
+        },
+        {
+          "name": "kamera_label",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 8
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Photoshooting",
+        "shootingState": "{\"anzahl\": 6, \"aktiv\": {\"kamera\": true, \"pose\": true, \"ausdruck\": true, \"format\": false, \"fokus\": true, \"rausch\": false}, \"serienSeed\": 776610, \"festesFormat\": \"2:3\"}"
+      },
+      "widgets_values": [
+        1,
+        "increment"
+      ]
+    },
+    {
+      "id": 94,
+      "type": "MarkdownNote",
+      "pos": [
+        2420,
+        60
+      ],
+      "size": [
+        420,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Prompt.** The template sets the order of the blocks. Keep `{style}` first: a black & white look only wins at the front."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 22,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        2420,
+        200
+      ],
+      "size": [
+        420,
+        140
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "title": "prompt template",
+      "widgets_values": [
+        "{style}, {expression}, {camera}, {scene}, {lighting}, {person}, {pose}"
+      ]
+    },
+    {
+      "id": 30,
+      "type": "Krea2PromptJoin",
+      "pos": [
+        2420,
+        380
+      ],
+      "size": [
+        420,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "person_1",
+          "type": "STRING",
+          "link": 8
+        },
+        {
+          "name": "pose",
+          "type": "STRING",
+          "link": 9
+        },
+        {
+          "name": "ausdruck",
+          "type": "STRING",
+          "link": 10
+        },
+        {
+          "name": "kamera",
+          "type": "STRING",
+          "link": 11
+        },
+        {
+          "name": "lighting",
+          "type": "STRING",
+          "link": 16
+        },
+        {
+          "name": "szene",
+          "type": "STRING",
+          "link": 17
+        },
+        {
+          "name": "stil",
+          "type": "STRING",
+          "link": 18
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 19,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            20
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2PromptJoin"
+      }
+    },
+    {
+      "id": 95,
+      "type": "MarkdownNote",
+      "pos": [
+        2920,
+        60
+      ],
+      "size": [
+        720,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Render.** Two passes: 8 steps, then a 1.5x refine at denoise 0.44. The negative is empty on purpose (CFG 1)."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 31,
+      "type": "CLIPTextEncode",
+      "pos": [
+        2920,
+        200
+      ],
+      "size": [
+        340,
+        220
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 4
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 20,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            21,
+            22,
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 32,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        2920,
+        460
+      ],
+      "size": [
+        340,
+        90
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            24,
+            25
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "title": "negative = empty"
+    },
+    {
+      "id": 33,
+      "type": "EmptySD3LatentImage",
+      "pos": [
+        2920,
+        590
+      ],
+      "size": [
+        340,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 12,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 13,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            26
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptySD3LatentImage"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        1
+      ]
+    },
+    {
+      "id": 40,
+      "type": "KSampler",
+      "pos": [
+        3300,
+        200
+      ],
+      "size": [
+        340,
+        280
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 2
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 14,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 21
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 24
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            27
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "title": "pass 1 — 8 steps",
+      "widgets_values": [
+        0,
+        "fixed",
+        8,
+        1.0,
+        "euler",
+        "simple",
+        1.0
+      ]
+    },
+    {
+      "id": 41,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        3300,
+        520
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            28
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LatentUpscaleBy"
+      },
+      "widgets_values": [
+        "bislerp",
+        1.5
+      ]
+    },
+    {
+      "id": 42,
+      "type": "KSampler",
+      "pos": [
+        3300,
+        680
+      ],
+      "size": [
+        340,
+        280
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 3
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 15,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 22
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 25
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 28
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            29
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "title": "pass 2 — refine at 0.44",
+      "widgets_values": [
+        0,
+        "fixed",
+        4,
+        1.0,
+        "euler_ancestral",
+        "simple",
+        0.44
+      ]
+    },
+    {
+      "id": 96,
+      "type": "MarkdownNote",
+      "pos": [
+        3720,
+        60
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Output.** *Monochrome* ships bypassed - select it and press Ctrl+B for true black & white."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 50,
+      "type": "VAEDecode",
+      "pos": [
+        3720,
+        200
+      ],
+      "size": [
+        440,
+        90
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 5
+        },
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            30
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 52,
+      "type": "Krea2Monochrome",
+      "pos": [
+        3720,
+        330
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            31
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Monochrome"
+      },
+      "widgets_values": [
+        "Neutral",
+        1.0
+      ],
+      "color": "#5a2a15",
+      "bgcolor": "#8a4a25"
+    },
+    {
+      "id": 51,
+      "type": "SaveImage",
+      "pos": [
+        3720,
+        480
+      ],
+      "size": [
+        440,
+        540
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 31
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "photoshoot/anchor"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        40,
+        610
+      ],
+      "size": [
+        340,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            2,
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "title": "optional - pick a LoRA, then Ctrl+B",
+      "widgets_values": [
+        "your-character-lora.safetensors",
+        1.0
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      4,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      4,
+      0,
+      40,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      4,
+      0,
+      42,
+      0,
+      "MODEL"
+    ],
+    [
+      4,
+      2,
+      0,
+      31,
+      0,
+      "CLIP"
+    ],
+    [
+      5,
+      3,
+      0,
+      50,
+      0,
+      "VAE"
+    ],
+    [
+      6,
+      10,
+      1,
+      11,
+      0,
+      "STRING"
+    ],
+    [
+      7,
+      13,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      11,
+      6,
+      30,
+      0,
+      "STRING"
+    ],
+    [
+      9,
+      11,
+      0,
+      30,
+      1,
+      "STRING"
+    ],
+    [
+      10,
+      11,
+      1,
+      30,
+      2,
+      "STRING"
+    ],
+    [
+      11,
+      11,
+      2,
+      30,
+      3,
+      "STRING"
+    ],
+    [
+      12,
+      11,
+      3,
+      33,
+      0,
+      "INT"
+    ],
+    [
+      13,
+      11,
+      4,
+      33,
+      1,
+      "INT"
+    ],
+    [
+      14,
+      11,
+      5,
+      40,
+      1,
+      "INT"
+    ],
+    [
+      15,
+      11,
+      5,
+      42,
+      1,
+      "INT"
+    ],
+    [
+      16,
+      12,
+      0,
+      30,
+      4,
+      "STRING"
+    ],
+    [
+      17,
+      20,
+      0,
+      30,
+      5,
+      "STRING"
+    ],
+    [
+      18,
+      21,
+      0,
+      30,
+      6,
+      "STRING"
+    ],
+    [
+      19,
+      22,
+      0,
+      30,
+      7,
+      "STRING"
+    ],
+    [
+      20,
+      30,
+      0,
+      31,
+      1,
+      "STRING"
+    ],
+    [
+      21,
+      31,
+      0,
+      40,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      22,
+      31,
+      0,
+      42,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      23,
+      31,
+      0,
+      32,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      24,
+      32,
+      0,
+      40,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      25,
+      32,
+      0,
+      42,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      26,
+      33,
+      0,
+      40,
+      4,
+      "LATENT"
+    ],
+    [
+      27,
+      40,
+      0,
+      41,
+      0,
+      "LATENT"
+    ],
+    [
+      28,
+      41,
+      0,
+      42,
+      4,
+      "LATENT"
+    ],
+    [
+      29,
+      42,
+      0,
+      50,
+      1,
+      "LATENT"
+    ],
+    [
+      30,
+      50,
+      0,
+      52,
+      0,
+      "IMAGE"
+    ],
+    [
+      31,
+      52,
+      0,
+      51,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "0 · Models",
+      "bounding": [
+        10,
+        -10,
+        400,
+        780
+      ],
+      "color": "#3f5159",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "1 · Who",
+      "bounding": [
+        430,
+        -10,
+        940,
+        670
+      ],
+      "color": "#593f5f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "2 · Look",
+      "bounding": [
+        1390,
+        -10,
+        460,
+        1070
+      ],
+      "color": "#5f3f4f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "3 · The shoot",
+      "bounding": [
+        1870,
+        -10,
+        500,
+        1200
+      ],
+      "color": "#5f4f3f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "4 · Prompt",
+      "bounding": [
+        2390,
+        -10,
+        480,
+        720
+      ],
+      "color": "#4f5f3f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "5 · Render",
+      "bounding": [
+        2890,
+        -10,
+        780,
+        1000
+      ],
+      "color": "#3f5f44",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "6 · Output",
+      "bounding": [
+        3690,
+        -10,
+        500,
+        1060
+      ],
+      "color": "#3f4f5f",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6,
+      "offset": [
+        80,
+        60
+      ]
+    }
+  },
+  "version": 0.4
+}
