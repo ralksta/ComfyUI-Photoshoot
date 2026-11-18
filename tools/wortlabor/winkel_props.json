@@ -1,0 +1,98 @@
+{
+  "_comment": [
+    "Wording lab: classical camera angles (3.1a), framing-coupled lenses (3.1b)",
+    "and hand props (3.2), rendered against the bare-word controls on three seeds."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Winkel, Brennweite & Requisiten",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "2:3",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Porträt", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Kamerawinkel",
+      "slot": "camera",
+      "kandidaten": [
+        {"id": "frosch-a", "label": "Froschperspektive", "bildausschnitt": "Amerikanisch",
+         "wortlaut": "low-angle hero shot from knee height looking up at her, the camera tilted steeply upward"},
+        {"id": "frosch-k", "label": "Froschperspektive", "bildausschnitt": "Amerikanisch", "kontrolle": true,
+         "wortlaut": "low-angle shot"},
+
+        {"id": "hoch-a", "label": "Von oben", "bildausschnitt": "Porträt",
+         "wortlaut": "high-angle shot from above looking down at her, camera held well above eye level, she tilts her face up toward the lens"},
+        {"id": "hoch-k", "label": "Von oben", "bildausschnitt": "Porträt", "kontrolle": true,
+         "wortlaut": "high-angle shot"},
+
+        {"id": "aufsicht-a", "label": "Vogelperspektive", "bildausschnitt": "Halbtotale",
+         "feste": {"pose": {"preset": "haltung/Auf dem Rücken liegend"}},
+         "wortlaut": "direct 90-degree overhead bird's-eye view straight down from above, camera pointing vertically down at her lying on her back"},
+        {"id": "aufsicht-k", "label": "Vogelperspektive", "bildausschnitt": "Halbtotale", "kontrolle": true,
+         "feste": {"pose": {"preset": "haltung/Auf dem Rücken liegend"}},
+         "wortlaut": "overhead bird's-eye view"},
+
+        {"id": "dutch-a", "label": "Dutch Angle", "bildausschnitt": "Halbtotale",
+         "wortlaut": "tilted Dutch angle shot, the camera rolled diagonally by 25 degrees so vertical lines and walls slant across the frame"},
+        {"id": "dutch-k", "label": "Dutch Angle", "bildausschnitt": "Halbtotale", "kontrolle": true,
+         "wortlaut": "Dutch angle"}
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Brennweite je Einstellung",
+      "slot": "camera",
+      "feste": {"style": "editorial photography, fine film grain"},
+      "kandidaten": [
+        {"id": "optik-28-a", "label": "28mm Weitwinkel", "bildausschnitt": "Ganzkörper",
+         "wortlaut": "shot on a 28mm wide-angle lens at f/5.6, deep depth of field, expansive room perspective"},
+        {"id": "optik-28-k", "label": "28mm Weitwinkel", "bildausschnitt": "Ganzkörper", "kontrolle": true,
+         "wortlaut": "28mm lens"},
+
+        {"id": "optik-85-a", "label": "85mm Porträt", "bildausschnitt": "Porträt",
+         "wortlaut": "shot on an 85mm f/1.4 portrait lens wide open, shallow depth of field, creamy background bokeh"},
+        {"id": "optik-85-k", "label": "85mm Porträt", "bildausschnitt": "Porträt", "kontrolle": true,
+         "wortlaut": "85mm f/1.4"},
+
+        {"id": "optik-100-a", "label": "100mm Makro", "bildausschnitt": "Nahaufnahme",
+         "wortlaut": "shot on a 100mm f/2.8 macro lens, paper-thin depth of field, background melted into soft blur"},
+        {"id": "optik-100-k", "label": "100mm Makro", "bildausschnitt": "Nahaufnahme", "kontrolle": true,
+         "wortlaut": "100mm macro lens"}
+      ]
+    },
+    {
+      "id": "C",
+      "titel": "Hände & Requisiten",
+      "slot": "pose",
+      "bildausschnitt": "Halbtotale",
+      "zusatz": {"feld": "arme", "preset": ["haltung/Stehend", "koerper/Frontal zur Kamera"]},
+      "kandidaten": [
+        {"id": "tasse-a", "label": "Kaffeetasse",
+         "wortlaut": "holding a warm ceramic coffee mug with both hands in front of her chest"},
+        {"id": "tasse-k", "label": "Kaffeetasse", "kontrolle": true,
+         "wortlaut": "holding a coffee cup"},
+
+        {"id": "buch-a", "label": "Buch",
+         "wortlaut": "holding an open hardcover book in both hands at waist height, looking up from the pages"},
+        {"id": "buch-k", "label": "Buch", "kontrolle": true,
+         "wortlaut": "holding a book"},
+
+        {"id": "glas-a", "label": "Weinglas",
+         "wortlaut": "holding a stemmed glass of red wine by the stem in one hand at chest height, the other arm relaxed"},
+        {"id": "glas-k", "label": "Weinglas", "kontrolle": true,
+         "wortlaut": "holding a glass of wine"},
+
+        {"id": "brille-a", "label": "Sonnenbrille",
+         "wortlaut": "one hand raised to the frame of dark sunglasses perched on her nose, lowering them slightly to look over the rim"},
+        {"id": "brille-k", "label": "Sonnenbrille", "kontrolle": true,
+         "wortlaut": "holding sunglasses"},
+
+        {"id": "blumen-a", "label": "Blumenstrauß",
+         "wortlaut": "cradling a bouquet of fresh cut flowers wrapped in kraft paper in her arms against her chest"},
+        {"id": "blumen-k", "label": "Blumenstrauß", "kontrolle": true,
+         "wortlaut": "holding flowers"}
+      ]
+    }
+  ]
+}
