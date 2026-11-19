@@ -1,0 +1,510 @@
+{
+  "Krea2Bausteine": {
+    "display_name": "Photoshoot – Pick Blocks",
+    "description": "Picks two persons, a scene and a style from the saved blocks. New entries appear only after a refresh (R).",
+    "inputs": {
+      "person_1": {
+        "name": "person_1"
+      },
+      "person_2": {
+        "name": "person_2"
+      },
+      "szene": {
+        "name": "scene"
+      },
+      "stil": {
+        "name": "style"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person_1",
+        "tooltip": "Stored text for Person 1 (empty when '—')."
+      },
+      "1": {
+        "name": "person_2",
+        "tooltip": "Stored text for Person 2 (empty when '—')."
+      },
+      "2": {
+        "name": "scene",
+        "tooltip": "Stored scene text (empty when '—')."
+      },
+      "3": {
+        "name": "style",
+        "tooltip": "Stored style text (empty when '—')."
+      }
+    }
+  },
+  "Krea2DatasetSave": {
+    "display_name": "Photoshoot – Save Dataset",
+    "description": "Saves each photo with its caption as a training pair for a character LoRA: output/photoshoot/dataset/<name>/NNNN.png and NNNN.txt, NNNN being the photo number. 'caption' and 'photo' come from the Series; 'trigger' goes in front of the caption unless it is already there.",
+    "inputs": {
+      "images": {
+        "name": "images"
+      },
+      "caption": {
+        "name": "caption"
+      },
+      "foto": {
+        "name": "photo"
+      },
+      "name": {
+        "name": "name"
+      },
+      "trigger": {
+        "name": "trigger"
+      }
+    }
+  },
+  "Krea2ExpressionBuilder": {
+    "display_name": "Photoshoot – Expression",
+    "description": "Composes a facial expression. Wire the output into the 'expression' input of Photoshoot Build Prompt and place it with {expression} in the text — as far forward as possible.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "expression",
+        "tooltip": "English mood, gaze, smile and facial expression prompt."
+      }
+    }
+  },
+  "Krea2LichtLoad": {
+    "display_name": "Photoshoot – Load Lighting",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "licht": {
+        "name": "lighting"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting",
+        "tooltip": "Stored English prompt text of the selected licht block."
+      }
+    }
+  },
+  "Krea2LichtSave": {
+    "display_name": "Photoshoot – Save Lighting",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "licht": {
+        "name": "lighting"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting",
+        "tooltip": "Pass-through licht prompt text."
+      }
+    }
+  },
+  "Krea2LightingBuilder": {
+    "display_name": "Photoshoot – Lighting",
+    "description": "Composes a photographic studio or ambient lighting setup. Wire the output into the 'lighting' input of Photoshoot Build Prompt and place it with {lighting} in the text.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "lighting",
+        "tooltip": "English studio or ambient lighting prompt."
+      }
+    }
+  },
+  "Krea2LocationBuilder": {
+    "display_name": "Photoshoot – Location",
+    "description": "Composes the set: place, time of day, weather and season - one set or several as tabs. 'scene' is the open set: wire it into the 'scene' input of Photoshoot Build Prompt. 'location_data' goes to the Series, which changes the sets over the series like outfits and fits the light to them.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "scene",
+        "tooltip": "Complete English location, time-of-day, weather and season prompt for the open set."
+      },
+      "1": {
+        "name": "location_data",
+        "tooltip": "JSON list of all Location sets for Photoshoot – Series (scaled per framing & coupled with lighting)."
+      }
+    }
+  },
+  "Krea2Monochrome": {
+    "display_name": "Photoshoot – Monochrome",
+    "description": "Makes the image truly black and white. The prompt delivers the look, but lipstick keeps a trace of colour - wire this between VAE Decode and Save Image and the trace is gone. Neutral, sepia or cool tint.",
+    "inputs": {
+      "images": {
+        "name": "images"
+      },
+      "toenung": {
+        "name": "tint"
+      },
+      "staerke": {
+        "name": "strength"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "images",
+        "tooltip": "True monochrome image with zero residual chroma (optional sepia or cool split-tone)."
+      }
+    }
+  },
+  "Krea2PersonBuilder": {
+    "display_name": "Photoshoot – Person",
+    "description": "Builds the person as English text. 'person' is always the full description; 'person_data' is the raw values as JSON for the Photoshoot, which shortens them per camera framing. Clothes come from a Wardrobe node on 'wardrobe': the person wears its open tab.",
+    "inputs": {
+      "garderobe": {
+        "name": "wardrobe"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person",
+        "tooltip": "Complete English person description for wiring directly into Build Prompt."
+      },
+      "1": {
+        "name": "person_data",
+        "tooltip": "Raw JSON person + wardrobe attributes for Photoshoot – Series (scaled per camera framing)."
+      }
+    }
+  },
+  "Krea2PersonLoad": {
+    "display_name": "Photoshoot – Load Person",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "person": {
+        "name": "person"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person",
+        "tooltip": "Stored English prompt text of the selected person block."
+      }
+    }
+  },
+  "Krea2PersonSave": {
+    "display_name": "Photoshoot – Save Person",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "person": {
+        "name": "person"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "person",
+        "tooltip": "Pass-through person prompt text."
+      }
+    }
+  },
+  "Krea2Photoshooting": {
+    "display_name": "Photoshoot – Series",
+    "description": "Varies camera, pose, expression and aspect ratio across a whole series. The person is optional via 'person_data' and gets shortened per framing; with a Wardrobe on the Person node the outfit changes over the series. 'person_data' and 'camera_label' are for optional extension packs. 'photo' is the photo number within the series, not a source of randomness - the noise seed comes out of 'image_seed'. 'refine' goes into a refine switch (the example workflows' Render node has one; off for a draft), 'filename' into Save Image's filename_prefix. 'caption' and 'photo' at the end feed Save Dataset: the training caption (trigger and what varies, never the identity) and the photo number. 'scene' and 'lighting' at the very end: the set of this photo from a Location node on 'location_data' (shortened for the close framings) and the light of the light axis - wire them into Build Prompt's scene and lighting instead of the fixed ones. 'prompt' at the end emits the assembled prompt directly (using embedded Studio settings when no separate builder nodes are wired), and 'motion' emits an image-to-video motion prompt for the current photo.",
+    "inputs": {
+      "foto": {
+        "name": "photo"
+      },
+      "width_in": {
+        "name": "width_in"
+      },
+      "height_in": {
+        "name": "height_in"
+      },
+      "person_data": {
+        "name": "person_data"
+      },
+      "ort_data": {
+        "name": "location_data"
+      },
+      "person_2_data": {
+        "name": "person_2_data"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "pose",
+        "tooltip": "Composed body pose prompt for this photo."
+      },
+      "1": {
+        "name": "expression",
+        "tooltip": "Composed facial expression prompt for this photo."
+      },
+      "2": {
+        "name": "camera",
+        "tooltip": "Framing, perspective, focus and optional lens prompt."
+      },
+      "3": {
+        "name": "width",
+        "tooltip": "Computed pixel width matching this photo's aspect ratio."
+      },
+      "4": {
+        "name": "height",
+        "tooltip": "Computed pixel height matching this photo's aspect ratio."
+      },
+      "5": {
+        "name": "image_seed",
+        "tooltip": "Deterministic noise seed derived from the photo index and series seed."
+      },
+      "6": {
+        "name": "person",
+        "tooltip": "Detail-adjusted person prompt (or left/right couple prompt)."
+      },
+      "7": {
+        "name": "person_data",
+        "tooltip": "Raw JSON person + wardrobe data after outfit selection for downstream packs."
+      },
+      "8": {
+        "name": "camera_label",
+        "tooltip": "German framing key label (e.g. Ganzkörper, Porträt) for downstream packs."
+      },
+      "9": {
+        "name": "refine",
+        "tooltip": "True for full render, False during Draft runs to bypass pass-2 refinement."
+      },
+      "10": {
+        "name": "filename",
+        "tooltip": "Output path prefix encoding series seed, photo index, take and draft status."
+      },
+      "11": {
+        "name": "caption",
+        "tooltip": "Training caption (varying elements + trigger only, no baked identity) for Save Dataset."
+      },
+      "12": {
+        "name": "photo",
+        "tooltip": "1-based photo number of this run (connect to Save Dataset)."
+      },
+      "13": {
+        "name": "scene",
+        "tooltip": "Location scene prompt for the active set, shortened for close framings."
+      },
+      "14": {
+        "name": "lighting",
+        "tooltip": "Lighting setup prompt from the Series light axis or Studio lighting state."
+      },
+      "15": {
+        "name": "prompt",
+        "tooltip": "Complete assembled prompt using wired or embedded Studio blocks."
+      },
+      "16": {
+        "name": "motion",
+        "tooltip": "Image-to-Video camera and subject movement prompt including next-shot transition."
+      }
+    }
+  },
+  "Krea2PoseBuilder": {
+    "display_name": "Photoshoot – Pose",
+    "description": "Composes a body pose. Wire the output into the 'pose' input of Photoshoot Build Prompt and place it with {pose} in the text — as far forward as possible.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "pose",
+        "tooltip": "English body posture, placement, arm, leg and tension prompt."
+      }
+    }
+  },
+  "Krea2PromptJoin": {
+    "display_name": "Photoshoot – Build Prompt",
+    "description": "Replaces {person1} {person2} {person3} {camera} {pose} {expression} {lighting} {scene} {style} {extra}. Recommended: {style}, {expression}, {camera}, {scene}, {lighting}, {person}, {pose}, {extra}. The German spellings still work. {extra} is for extension packs. Without placeholders the parts follow in that same order.",
+    "inputs": {
+      "text": {
+        "name": "text"
+      },
+      "person_1": {
+        "name": "person_1"
+      },
+      "person_2": {
+        "name": "person_2"
+      },
+      "person_3": {
+        "name": "person_3"
+      },
+      "kamera": {
+        "name": "camera"
+      },
+      "pose": {
+        "name": "pose"
+      },
+      "ausdruck": {
+        "name": "expression"
+      },
+      "licht": {
+        "name": "lighting"
+      },
+      "lighting": {
+        "name": "lighting"
+      },
+      "szene": {
+        "name": "scene"
+      },
+      "stil": {
+        "name": "style"
+      },
+      "extra": {
+        "name": "extra"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt",
+        "tooltip": "Final assembled prompt with placeholders replaced and stray commas cleaned up."
+      }
+    }
+  },
+  "Krea2PromptLoad": {
+    "display_name": "Photoshoot – Load Prompt",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "prompt": {
+        "name": "prompt"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt",
+        "tooltip": "Stored English prompt text of the selected prompt block."
+      }
+    }
+  },
+  "Krea2PromptSave": {
+    "display_name": "Photoshoot – Save Prompt",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "prompt": {
+        "name": "prompt"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "prompt",
+        "tooltip": "Pass-through prompt prompt text."
+      }
+    }
+  },
+  "Krea2StilLoad": {
+    "display_name": "Photoshoot – Load Style",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "stil": {
+        "name": "style"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "style",
+        "tooltip": "Stored English prompt text of the selected stil block."
+      }
+    }
+  },
+  "Krea2StilSave": {
+    "display_name": "Photoshoot – Save Style",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "stil": {
+        "name": "style"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "style",
+        "tooltip": "Pass-through stil prompt text."
+      }
+    }
+  },
+  "Krea2StyleBuilder": {
+    "display_name": "Photoshoot – Style",
+    "description": "Composes the photographic look: colour or black and white, film stock, genre, lens, finish. Wire the output into the 'style' input of Photoshoot Build Prompt and place it with {style} in the text.",
+    "inputs": {
+      "seed": {
+        "name": "seed"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "style",
+        "tooltip": "English film look, colour/B&W treatment, genre, lens and finish prompt."
+      }
+    }
+  },
+  "Krea2SzeneLoad": {
+    "display_name": "Photoshoot – Load Scene",
+    "description": "Outputs the text of a saved block.",
+    "inputs": {
+      "szene": {
+        "name": "scene"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "scene",
+        "tooltip": "Stored English prompt text of the selected szene block."
+      }
+    }
+  },
+  "Krea2SzeneSave": {
+    "display_name": "Photoshoot – Save Scene",
+    "description": "Stores the text under a name. Flip the switch to 'save', run once, then switch it back. New names appear in the loading node only after a refresh (R).",
+    "inputs": {
+      "szene": {
+        "name": "scene"
+      },
+      "name": {
+        "name": "name"
+      },
+      "speichern": {
+        "name": "save"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "scene",
+        "tooltip": "Pass-through szene prompt text."
+      }
+    }
+  },
+  "Krea2Wardrobe": {
+    "display_name": "Photoshoot – Wardrobe",
+    "description": "The outfits of a shoot, as tabs. Wire 'wardrobe' into the Person node: the person wears the open tab, and a Series node changes through all outfits.",
+    "outputs": {
+      "0": {
+        "name": "wardrobe",
+        "tooltip": "JSON list of outfits and active outfit tab for Photoshoot – Person."
+      }
+    }
+  }
+}

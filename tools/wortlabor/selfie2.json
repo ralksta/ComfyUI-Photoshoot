@@ -1,0 +1,101 @@
+{
+  "_comment": [
+    "Wording lab, round 2 of the selfie mode (docs/ROADMAP.md, F4). Round 1",
+    "(selfie.json, rendered 2026-09-30) adopted Selfie von oben, auf Augenhöhe,",
+    "im Liegen, Spiegel-Selfie, Kusshand, Peace-Zeichen and the smartphone",
+    "genre; these five did not come out and get new wordings here, each against",
+    "its bare word. Same person, seeds and 9:16 format as round 1.",
+    "",
+    "Group A: the camera slot, the framing's wording first (kamera_mit_ausschnitt).",
+    "A low angle has to be forced by what only a low angle shows - the underside",
+    "of the chin and jaw, the nostrils, the ceiling behind the head, the phone",
+    "held below the face - rather than by naming the angle, which round 1 did.",
+    "Over the shoulder needs the back to the lens: round 1 turned the body only",
+    "slightly, so these candidates are rendered as a medium shot, where the back",
+    "and shoulder fit into the frame. The adopted 'Selfie von oben' (it came out",
+    "only slightly above eye level) is the reference row of a steeper",
+    "alternative.",
+    "",
+    "Group B: the expression slot with the camera gaze, next to the adopted",
+    "eye-level selfie (the built-in perspective, as a series sends it). The eye",
+    "roll runs without the camera gaze, as in round 1: it looks away.",
+    "",
+    "The format is tools/wortlabor.py's (photoshoot-wortlabor/1); a",
+    "{\"preset\": \"perspektive/<label>\"} in the camera slot is an adopted",
+    "perspective of nodes/shooting.py."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Selfie Runde 2",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "9:16",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Porträt", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Perspektive, Runde 2",
+      "slot": "camera",
+      "feste": {"style": "",
+                "expression": {"preset": ["stimmung/Warmes Lächeln", "blick/In die Kamera"]}},
+      "kandidaten": [
+        {"id": "unten2-a", "label": "Selfie von unten",
+         "wortlaut": "worm's-eye selfie from below her chin, the phone held at chest height pointing up, her nostrils and jawline visible, ceiling behind her"},
+        {"id": "unten2-b", "label": "Selfie von unten",
+         "wortlaut": "low-angle selfie, the phone held low at her waist and tilted up, the underside of her chin and jaw in the foreground, she looks down into the lens, ceiling lights above her head"},
+        {"id": "unten2-c", "label": "Selfie von unten",
+         "wortlaut": "selfie seen from far below, the camera looking up her neck at her face, her face foreshortened, only the ceiling behind her"},
+        {"id": "unten2-k", "label": "Selfie von unten", "kontrolle": true,
+         "wortlaut": "selfie from below"},
+
+        {"id": "schulter2-a", "label": "Selfie über die Schulter", "bildausschnitt": "Halbtotale",
+         "wortlaut": "over-the-shoulder selfie, her back and one shoulder to the lens, body turned away from the camera, her face turned back over the shoulder into the phone held at arm's length"},
+        {"id": "schulter2-b", "label": "Selfie über die Schulter", "bildausschnitt": "Halbtotale",
+         "wortlaut": "selfie from behind, she stands with her back to the camera and twists her head around to look back into the lens, her shoulder and upper back in the foreground"},
+        {"id": "schulter2-k", "label": "Selfie über die Schulter", "kontrolle": true, "bildausschnitt": "Halbtotale",
+         "wortlaut": "over-the-shoulder selfie"},
+
+        {"id": "oben2-a", "label": "Selfie von oben",
+         "wortlaut": "top-down selfie, the phone held high directly above her, the camera looking straight down at her upturned face, her forehead and eyes large, her chin small"},
+        {"id": "oben-ref", "label": "Selfie von oben", "kontrolle": true,
+         "_comment": "The adopted wording (oben-a of round 1) as the reference, not a bare word.",
+         "wortlaut": {"preset": "perspektive/Selfie von oben"}}
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Selfie-Ausdruck, Runde 2",
+      "slot": "expression",
+      "zusatz": {"feld": "stimmung", "preset": ["blick/In die Kamera"]},
+      "feste": {"style": "",
+                "camera": {"preset": "perspektive/Selfie auf Augenhöhe"},
+                "expression": {"preset": ["stimmung/Warmes Lächeln", "blick/In die Kamera"]}},
+      "kandidaten": [
+        {"id": "schmoll2-a", "label": "Schmollmund",
+         "wortlaut": "a clear duck face, lips pushed forward into an exaggerated pout, cheeks sucked in"},
+        {"id": "schmoll2-b", "label": "Schmollmund",
+         "wortlaut": "making a duck face at the camera, puckered lips pushed far out, eyebrows raised"},
+        {"id": "schmoll2-k", "label": "Schmollmund", "kontrolle": true,
+         "wortlaut": "duck face"},
+
+        {"id": "zunge2-a", "label": "Zunge raus",
+         "wortlaut": "tongue clearly sticking out of her mouth"},
+        {"id": "zunge2-b", "label": "Zunge raus",
+         "wortlaut": "sticking her tongue far out at the camera, mouth open, a playful grimace"},
+        {"id": "zunge2-k", "label": "Zunge raus", "kontrolle": true,
+         "wortlaut": "tongue out"},
+
+        {"id": "augen2-a", "label": "Augenrollen", "zusatz": null,
+         "wortlaut": "eyes rolled up toward the ceiling, only the whites and lower irises visible, exasperated smirk"},
+        {"id": "augen2-b", "label": "Augenrollen", "zusatz": null,
+         "wortlaut": "rolling her eyes upward in exaggerated annoyance, the irises turned up under the upper lids, lips pressed into a flat line"},
+        {"id": "augen2-k", "label": "Augenrollen", "kontrolle": true, "zusatz": null,
+         "wortlaut": "eye roll"},
+
+        {"id": "lachen-k", "label": "Breites Lachen", "kontrolle": true,
+         "_comment": "The group's control from round 1, on every sheet.",
+         "wortlaut": {"preset": "stimmung/Breites Lachen"}}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,327 @@
+{
+  "_comment": [
+    "Wording lab: candidate wordings for the Location node (docs/ROADMAP.md, F1),",
+    "rendered side by side by tools/wortlabor.py. Nothing here is a preset yet: a",
+    "wording moves into PRESETS (nodes/location_builder.py) only after the user's",
+    "verdict on the sheets; the smoke test holds PRESETS to the tested wordings.",
+    "",
+    "Every candidate goes into the scene slot, the way the Location node's set",
+    "reaches Build Prompt; the light slot stays empty so no light setup competes",
+    "with the place, and the example's person, style and template stay as they",
+    "are (tools/baue_workflow.py). bildausschnitt is the Series framing: full body",
+    "for the places, so the set is in frame, and kamera_mit_ausschnitt puts the",
+    "Series' own wording for it into the camera slot. Groups A-D are the four",
+    "families (studio, urban, nature, interior): four places each, two",
+    "candidates against the bare word (kontrolle). D starts with the loft, the",
+    "one place already in PRESETS, as the reference row (referenz).",
+    "E-G are time of day, weather and season, split so each sheet stays",
+    "readable: each candidate is composed with a place by the node's own",
+    "compose_location() (zusatz; 'texte' puts another candidate's wording into",
+    "a field), outdoors on gasse-a, the seasons on wald-a; two time-of-day rows",
+    "sit on the loft, since time of day applies indoors too. Weather and season",
+    "are outdoor fields (NUR_DRAUSSEN) and are tested outdoors only.",
+    "H tests the Series' short form for close framings (location_builder.",
+    "kurzform(): the first clause of each part) at portrait framing: the full",
+    "set as control against its short form."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Orte",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "2:3",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Ganzkörper", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Studio",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "kandidaten": [
+        {"id": "weiss-a", "label": "Weißer Hintergrund",
+         "wortlaut": "a photo studio with a seamless white paper backdrop curving into the floor"},
+        {"id": "weiss-b", "label": "Weißer Hintergrund",
+         "wortlaut": "an empty white cyclorama studio, white walls and floor without visible edges"},
+        {"id": "weiss-k", "label": "Weißer Hintergrund", "kontrolle": true,
+         "wortlaut": "a white studio background"},
+
+        {"id": "grau-a", "label": "Grauer Hintergrund",
+         "wortlaut": "a photo studio with a mottled grey hand-painted canvas backdrop"},
+        {"id": "grau-b", "label": "Grauer Hintergrund",
+         "wortlaut": "a plain mid-grey paper backdrop in a photo studio, grey floor"},
+        {"id": "grau-k", "label": "Grauer Hintergrund", "kontrolle": true,
+         "wortlaut": "a grey studio background"},
+
+        {"id": "farbe-a", "label": "Farbiger Hintergrund",
+         "wortlaut": "a photo studio with a saturated terracotta orange paper backdrop and matching floor"},
+        {"id": "farbe-b", "label": "Farbiger Hintergrund",
+         "wortlaut": "a solid backdrop of deep teal seamless paper in a photo studio"},
+        {"id": "farbe-k", "label": "Farbiger Hintergrund", "kontrolle": true,
+         "wortlaut": "a coloured studio background"},
+
+        {"id": "tageslicht-a", "label": "Tageslichtstudio",
+         "wortlaut": "a daylight photo studio with tall industrial windows, white brick walls and a grey concrete floor"},
+        {"id": "tageslicht-b", "label": "Tageslichtstudio",
+         "wortlaut": "a large white daylight studio, north-facing windows, pale wooden floor, a single white stool"},
+        {"id": "tageslicht-k", "label": "Tageslichtstudio", "kontrolle": true,
+         "wortlaut": "a daylight studio"}
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Stadt",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "kandidaten": [
+        {"id": "gasse-a", "label": "Altstadtgasse",
+         "wortlaut": "a narrow cobbled lane between old stone houses with wooden shutters"},
+        {"id": "gasse-b", "label": "Altstadtgasse",
+         "wortlaut": "an old town alley, worn cobblestones, pastel plaster facades, flower boxes under the windows"},
+        {"id": "gasse-k", "label": "Altstadtgasse", "kontrolle": true,
+         "wortlaut": "an old town street"},
+
+        {"id": "strasse-a", "label": "Großstadtstraße",
+         "wortlaut": "a wide city sidewalk with glass shopfronts, parked cars and passing pedestrians"},
+        {"id": "strasse-b", "label": "Großstadtstraße",
+         "wortlaut": "a downtown street between tall office buildings, crosswalk markings on the asphalt"},
+        {"id": "strasse-k", "label": "Großstadtstraße", "kontrolle": true,
+         "wortlaut": "a city street"},
+
+        {"id": "dach-a", "label": "Dachterrasse",
+         "wortlaut": "a rooftop terrace with a metal railing, the city skyline spread out behind"},
+        {"id": "dach-b", "label": "Dachterrasse",
+         "wortlaut": "a flat concrete rooftop above the city, water towers and high-rise buildings in the distance"},
+        {"id": "dach-k", "label": "Dachterrasse", "kontrolle": true,
+         "wortlaut": "a rooftop"},
+
+        {"id": "beton-a", "label": "Betonarchitektur",
+         "wortlaut": "a brutalist concrete plaza with massive raw concrete walls and wide steps"},
+        {"id": "beton-b", "label": "Betonarchitektur",
+         "wortlaut": "modernist architecture, smooth grey concrete walls and sharp geometric shadows"},
+        {"id": "beton-k", "label": "Betonarchitektur", "kontrolle": true,
+         "wortlaut": "concrete architecture"}
+      ]
+    },
+    {
+      "id": "C",
+      "titel": "Natur",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "kandidaten": [
+        {"id": "wald-a", "label": "Wald",
+         "wortlaut": "a dense forest of tall pine trunks, ferns and moss on the ground"},
+        {"id": "wald-b", "label": "Wald",
+         "wortlaut": "a woodland clearing surrounded by tall beech trees, soft grass underfoot"},
+        {"id": "wald-k", "label": "Wald", "kontrolle": true,
+         "wortlaut": "a forest"},
+
+        {"id": "strand-a", "label": "Strand",
+         "wortlaut": "a wide sandy beach with gentle waves rolling onto the shore"},
+        {"id": "strand-b", "label": "Strand",
+         "wortlaut": "a beach of pale sand and dune grass, the open sea on the horizon"},
+        {"id": "strand-k", "label": "Strand", "kontrolle": true,
+         "wortlaut": "a beach"},
+
+        {"id": "wiese-a", "label": "Blumenwiese",
+         "wortlaut": "a meadow of tall grass and wildflowers stretching to a line of trees"},
+        {"id": "wiese-b", "label": "Blumenwiese",
+         "wortlaut": "a field of knee-high grass dotted with poppies and daisies"},
+        {"id": "wiese-k", "label": "Blumenwiese", "kontrolle": true,
+         "wortlaut": "a meadow"},
+
+        {"id": "berg-a", "label": "Bergpanorama",
+         "wortlaut": "an alpine meadow on a mountainside, rocky peaks rising in the background"},
+        {"id": "berg-b", "label": "Bergpanorama",
+         "wortlaut": "a high mountain trail with a view over a valley and distant snow-capped ridges"},
+        {"id": "berg-k", "label": "Bergpanorama", "kontrolle": true,
+         "wortlaut": "mountains"}
+      ]
+    },
+    {
+      "id": "D",
+      "titel": "Innenraum",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "kandidaten": [
+        {"id": "loft-ref", "label": "Sonniges Loft", "referenz": true,
+         "wortlaut": {"preset": "ort/Sonniges Loft"}},
+
+        {"id": "cafe-a", "label": "Café",
+         "wortlaut": "a small café interior with marble tables, bentwood chairs and a wooden counter"},
+        {"id": "cafe-b", "label": "Café",
+         "wortlaut": "a coffee shop, an espresso machine on the counter, a chalkboard menu on the brick wall"},
+        {"id": "cafe-k", "label": "Café", "kontrolle": true,
+         "wortlaut": "a café"},
+
+        {"id": "altbau-a", "label": "Altbauwohnung",
+         "wortlaut": "an old apartment with high stucco ceilings, herringbone parquet and tall double doors"},
+        {"id": "altbau-b", "label": "Altbauwohnung",
+         "wortlaut": "a period apartment living room, ornate plaster moulding, parquet floor, a velvet sofa"},
+        {"id": "altbau-k", "label": "Altbauwohnung", "kontrolle": true,
+         "wortlaut": "an old apartment"},
+
+        {"id": "hotel-a", "label": "Hotelzimmer",
+         "wortlaut": "a hotel room with a large bed in white linen, a bedside lamp and heavy curtains"},
+        {"id": "hotel-b", "label": "Hotelzimmer",
+         "wortlaut": "a boutique hotel room, an upholstered headboard, a writing desk by the window"},
+        {"id": "hotel-k", "label": "Hotelzimmer", "kontrolle": true,
+         "wortlaut": "a hotel room"},
+
+        {"id": "bibliothek-a", "label": "Bibliothek",
+         "wortlaut": "a library with floor-to-ceiling wooden bookshelves and a rolling ladder"},
+        {"id": "bibliothek-b", "label": "Bibliothek",
+         "wortlaut": "a reading room lined with old leather-bound books, green-shaded desk lamps on long tables"},
+        {"id": "bibliothek-k", "label": "Bibliothek", "kontrolle": true,
+         "wortlaut": "a library"}
+      ]
+    },
+    {
+      "id": "E",
+      "titel": "Tageszeit",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "zusatz": {"feld": "tageszeit", "texte": {"ort": {"kandidat": "gasse-a"}}},
+      "kandidaten": [
+        {"id": "morgen-a", "label": "Morgen",
+         "wortlaut": "early in the morning, the place still quiet and empty"},
+        {"id": "morgen-b", "label": "Morgen",
+         "wortlaut": "morning, fresh pale daylight"},
+        {"id": "morgen-k", "label": "Morgen", "kontrolle": true,
+         "wortlaut": "morning"},
+
+        {"id": "mittag-a", "label": "Mittag",
+         "wortlaut": "at midday under a high sun, short shadows"},
+        {"id": "mittag-b", "label": "Mittag",
+         "wortlaut": "in the middle of the day, bright even daylight"},
+        {"id": "mittag-k", "label": "Mittag", "kontrolle": true,
+         "wortlaut": "midday"},
+
+        {"id": "golden-a", "label": "Goldene Stunde",
+         "wortlaut": "at golden hour, the low sun turning everything warm"},
+        {"id": "golden-b", "label": "Goldene Stunde",
+         "wortlaut": "late afternoon, warm low sunlight and long shadows"},
+        {"id": "golden-k", "label": "Goldene Stunde", "kontrolle": true,
+         "wortlaut": "golden hour"},
+
+        {"id": "blau-a", "label": "Blaue Stunde",
+         "wortlaut": "at blue hour after sunset, deep blue sky, the first lights coming on"},
+        {"id": "blau-b", "label": "Blaue Stunde",
+         "wortlaut": "at dusk, a blue twilight sky and lit windows"},
+        {"id": "blau-k", "label": "Blaue Stunde", "kontrolle": true,
+         "wortlaut": "blue hour"},
+
+        {"id": "nacht-a", "label": "Nacht",
+         "wortlaut": "at night, dark sky, street lamps and lit windows"},
+        {"id": "nacht-b", "label": "Nacht",
+         "wortlaut": "late at night, darkness lit only by artificial lights"},
+        {"id": "nacht-k", "label": "Nacht", "kontrolle": true,
+         "wortlaut": "at night"},
+
+        {"id": "morgen-loft", "label": "Morgen", "zusatz": {"feld": "tageszeit", "preset": ["ort/Sonniges Loft"]},
+         "wortlaut": {"kandidat": "morgen-a"}},
+
+        {"id": "nacht-loft", "label": "Nacht", "zusatz": {"feld": "tageszeit", "preset": ["ort/Sonniges Loft"]},
+         "wortlaut": {"kandidat": "nacht-a"}}
+      ]
+    },
+    {
+      "id": "F",
+      "titel": "Wetter",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "zusatz": {"feld": "wetter", "texte": {"ort": {"kandidat": "gasse-a"}}},
+      "kandidaten": [
+        {"id": "klar-a", "label": "Klar",
+         "wortlaut": "under a clear blue sky, crisp dry air"},
+        {"id": "klar-b", "label": "Klar",
+         "wortlaut": "a cloudless sunny day"},
+        {"id": "klar-k", "label": "Klar", "kontrolle": true,
+         "wortlaut": "clear sky"},
+
+        {"id": "bewoelkt-a", "label": "Bewölkt",
+         "wortlaut": "under a flat grey overcast sky"},
+        {"id": "bewoelkt-b", "label": "Bewölkt",
+         "wortlaut": "a cloudy day, thick soft clouds covering the sky"},
+        {"id": "bewoelkt-k", "label": "Bewölkt", "kontrolle": true,
+         "wortlaut": "overcast"},
+
+        {"id": "regen-a", "label": "Regen",
+         "wortlaut": "in the rain, wet glistening pavement, raindrops in the air"},
+        {"id": "regen-b", "label": "Regen",
+         "wortlaut": "a rainy day, puddles reflecting the surroundings, streaks of falling rain"},
+        {"id": "regen-k", "label": "Regen", "kontrolle": true,
+         "wortlaut": "rain"},
+
+        {"id": "nebel-a", "label": "Nebel",
+         "wortlaut": "in thick fog, the background fading into soft grey mist"},
+        {"id": "nebel-b", "label": "Nebel",
+         "wortlaut": "misty air, a soft haze hiding everything in the distance"},
+        {"id": "nebel-k", "label": "Nebel", "kontrolle": true,
+         "wortlaut": "fog"},
+
+        {"id": "schnee-a", "label": "Schnee",
+         "wortlaut": "in falling snow, snow covering the ground"},
+        {"id": "schnee-b", "label": "Schnee",
+         "wortlaut": "a snowy scene, fresh white snow on every surface, snowflakes in the air"},
+        {"id": "schnee-k", "label": "Schnee", "kontrolle": true,
+         "wortlaut": "snow"}
+      ]
+    },
+    {
+      "id": "G",
+      "titel": "Jahreszeit",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "zusatz": {"feld": "jahreszeit", "texte": {"ort": {"kandidat": "wald-a"}}},
+      "kandidaten": [
+        {"id": "fruehling-a", "label": "Frühling",
+         "wortlaut": "in spring, fresh green leaves and blossoming branches"},
+        {"id": "fruehling-b", "label": "Frühling",
+         "wortlaut": "springtime, new pale green growth and early flowers"},
+        {"id": "fruehling-k", "label": "Frühling", "kontrolle": true,
+         "wortlaut": "spring"},
+
+        {"id": "sommer-a", "label": "Sommer",
+         "wortlaut": "in high summer, lush deep green foliage, warm dry air"},
+        {"id": "sommer-b", "label": "Sommer",
+         "wortlaut": "a summer day, everything in full leaf"},
+        {"id": "sommer-k", "label": "Sommer", "kontrolle": true,
+         "wortlaut": "summer"},
+
+        {"id": "herbst-a", "label": "Herbst",
+         "wortlaut": "in autumn, orange and red leaves, fallen leaves on the ground"},
+        {"id": "herbst-b", "label": "Herbst",
+         "wortlaut": "autumn foliage in gold and rust, leaves drifting down"},
+        {"id": "herbst-k", "label": "Herbst", "kontrolle": true,
+         "wortlaut": "autumn"},
+
+        {"id": "winter-a", "label": "Winter",
+         "wortlaut": "in winter, bare branches, frost and snow on the ground"},
+        {"id": "winter-b", "label": "Winter",
+         "wortlaut": "a winter landscape, everything under a layer of snow"},
+        {"id": "winter-k", "label": "Winter", "kontrolle": true,
+         "wortlaut": "winter"}
+      ]
+    },
+    {
+      "id": "H",
+      "titel": "Kurzform (nah)",
+      "slot": "scene",
+      "feste": {"lighting": ""},
+      "bildausschnitt": "Porträt",
+      "kandidaten": [
+        {"id": "kurz-loft-voll", "label": "Sonniges Loft (voll)", "kontrolle": true,
+         "wortlaut": {"preset": "ort/Sonniges Loft"}},
+
+        {"id": "kurz-loft", "label": "Sonniges Loft (Kurzform)",
+         "wortlaut": "a sunlit loft with tall windows"},
+
+        {"id": "kurz-gasse-voll", "label": "Altstadtgasse (voll)", "kontrolle": true,
+         "wortlaut": {"kandidat": "gasse-b"}},
+
+        {"id": "kurz-gasse", "label": "Altstadtgasse (Kurzform)",
+         "wortlaut": "an old town alley"}
+      ]
+    }
+  ]
+}

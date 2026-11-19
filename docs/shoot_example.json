@@ -1,0 +1,76 @@
+{
+  "_comment": [
+    "Photoshoot shoot file - a whole shoot in one file: the person, her outfits,",
+    "the lighting and style, the series plan, the scene and the prompt template.",
+    "",
+    "JSON has no comments, so every explanation sits in a key starting with an",
+    "underscore (_comment). Photoshoot skips those keys, so this file loads as it is.",
+    "",
+    "HOW TO USE IT",
+    "Open the Series node's shoot row (Shoot: ... File) and choose this file, or",
+    "copy it into ComfyUI/user/krea2_shoots/ - then it shows up there as a chip.",
+    "A preview shows what goes where before anything changes; Undo takes it back.",
+    "",
+    "Every section is optional; a missing one leaves that node as it is. Each",
+    "section is the node's state as the node keeps it. Labels may be the English",
+    "names the interface shows (as here) or the German keys a saved shoot",
+    "carries - both load. A label that does not exist is reported and left out.",
+    "The Director (Series panel -> Director) writes the same format from one",
+    "sentence, through any chat LLM."
+  ],
+
+  "format": "photoshoot-shoot/1",
+  "name": "Sunlit loft",
+  "brief": "a red-haired woman in a sunlit loft, two outfits, calm and friendly",
+
+  "person": {
+    "felder": {
+      "gender": "Woman", "age": "Late 20s", "ethnicity": "Scandinavian",
+      "skinTone": "Very fair", "figure": "Athletic", "height": "Tall",
+      "hair": "Long waves", "hairColor": "Copper red", "eyes": "Greyish green",
+      "cheekbones": "High, pronounced", "lipColor": "Dusty rose", "lipFinish": "Matte"
+    },
+    "mehrfach": {"skinFeatures": ["Freckles"]},
+    "texte": {"ageExact": "", "details": "", "trigger": ""}
+  },
+
+  "_comment_wardrobe": "One tab per outfit. The series changes costume in blocks (or mixed, see outfitFolge).",
+  "wardrobe": {
+    "outfits": [
+      {"id": "coat", "name": "Coat",
+       "felder": {"hosiery": "Bare legs", "shoes": "Combat boots", "shoesColor": "Black"},
+       "texte": {"details": "wearing a charcoal wool coat"}},
+      {"id": "knit", "name": "Knit",
+       "felder": {"top": "Ribbed crop top", "topColor": "Cream",
+                  "bottom": "Wide-leg trousers", "bottomColor": "Black",
+                  "shoes": "Block heel pumps", "shoesColor": "Black", "jewellery": "Hoops"},
+       "texte": {"details": ""}}
+    ],
+    "aktiv": 0
+  },
+
+  "lighting": {"felder": {"setup": "Softbox diffused light", "richtung": "Frontal 45°",
+                          "atmosphaere": "Crystal clear & sharp"}},
+  "style": {"felder": {"genre": "Editorial", "optik": "85mm f/1.4"}},
+
+  "_comment_series": [
+    "anzahl = photos, start = first photo number, serienSeed = the seed when the",
+    "noise switch (aktiv.rausch) is off. pools narrow a field to a family",
+    "(haltung = posture, stimmung = mood) or switch it off. kameras and fokusse",
+    "are the framings and focus areas to use; null means all of them."
+  ],
+  "series": {
+    "anzahl": 12, "start": 1, "serienSeed": 0,
+    "aktiv": {"kamera": true, "pose": true, "ausdruck": true, "format": true,
+              "fokus": true, "rausch": true, "outfit": true},
+    "pools": {"haltung": "standing", "stimmung": "friendly"},
+    "kameras": ["Portrait", "Medium shot", "Cowboy shot", "Full body"],
+    "fokusse": null,
+    "reihenfolge": "gezogen",
+    "bogen": false,
+    "outfitFolge": "bloecke"
+  },
+
+  "scene": "a sunlit loft with tall windows, wooden floor, plants in the corner",
+  "template": "{style}, {expression}, {camera}, {scene}, {lighting}, {person}, {pose}"
+}

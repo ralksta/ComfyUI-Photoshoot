@@ -1,0 +1,133 @@
+{
+  "format": "photoshoot-wortlabor/1",
+  "zweck": "Asymmetric and angled Location wordings (with a relaxed contrapposto pose) to break central vanishing-point symmetry and linear tree/building rows.",
+  "bildformat": "2:3",
+  "seeds": [776610, 1401181143, 42],
+  "basis": {
+    "von": "beispiel-workflow",
+    "bildausschnitt": "Ganzkörper",
+    "kamera_mit_ausschnitt": true
+  },
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Natur asymmetrisch (Wald, Blumenwiese, Strand)",
+      "slot": "scene",
+      "feste": {
+        "lighting": "",
+        "pose": {"preset": ["haltung/Stehend, Gewicht auf einem Bein", "koerper/Leicht zur Seite gedreht"]},
+        "expression": {"preset": ["stimmung/Entspannt", "blick/In die Kamera"]}
+      },
+      "kandidaten": [
+        {
+          "id": "wald2-a",
+          "label": "Wald (a)",
+          "wortlaut": "a winding forest path among gnarled old trees at uneven depths, mossy roots, ferns and dappled undergrowth"
+        },
+        {
+          "id": "wald2-b",
+          "label": "Wald (b)",
+          "wortlaut": "an asymmetric woodland clearing at the edge of an old forest, crooked mossy tree trunks and ferns at varying distances"
+        },
+        {
+          "id": "wald2-k",
+          "label": "Wald (bisherig)",
+          "wortlaut": "a dense forest of tall pine trunks, ferns and moss on the ground",
+          "kontrolle": true
+        },
+        {
+          "id": "wiese2-a",
+          "label": "Blumenwiese (a)",
+          "wortlaut": "a rolling hillside meadow of tall grass, poppies and daisies, a crooked wooden fence and scattered bushes at an angle"
+        },
+        {
+          "id": "wiese2-b",
+          "label": "Blumenwiese (b)",
+          "wortlaut": "an uneven wildflower meadow with poppies and daisies along a winding dirt track, scattered trees in the background"
+        },
+        {
+          "id": "wiese2-k",
+          "label": "Blumenwiese (bisherig)",
+          "wortlaut": "a field of knee-high grass dotted with poppies and daisies",
+          "kontrolle": true
+        },
+        {
+          "id": "strand2-a",
+          "label": "Strand (a)",
+          "wortlaut": "a curving sandy coastline seen at an angle, driftwood and dune grass on one side, waves breaking diagonally along the shore"
+        },
+        {
+          "id": "strand2-b",
+          "label": "Strand (b)",
+          "wortlaut": "a coastal beach cove with weathered rocks on one side and gentle surf curving into the sandy shore"
+        },
+        {
+          "id": "strand2-k",
+          "label": "Strand (bisherig)",
+          "wortlaut": "a wide sandy beach with gentle waves rolling onto the shore",
+          "kontrolle": true
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Stadt & Innen asymmetrisch (Altstadtgasse, Großstadtstraße, Bibliothek)",
+      "slot": "scene",
+      "feste": {
+        "lighting": "",
+        "pose": {"preset": ["haltung/Stehend, Gewicht auf einem Bein", "koerper/Leicht zur Seite gedreht"]},
+        "expression": {"preset": ["stimmung/Entspannt", "blick/In die Kamera"]}
+      },
+      "kandidaten": [
+        {
+          "id": "gasse2-a",
+          "label": "Altstadtgasse (a)",
+          "wortlaut": "a gently curving old town cobblestone lane seen at an angle, stepped pastel plaster facades, flower boxes and a corner lantern"
+        },
+        {
+          "id": "gasse2-b",
+          "label": "Altstadtgasse (b)",
+          "wortlaut": "an old town street corner where two cobbled lanes meet at an angle, weathered plaster facade and wooden shutters"
+        },
+        {
+          "id": "gasse2-k",
+          "label": "Altstadtgasse (bisherig)",
+          "wortlaut": "an old town alley, worn cobblestones, pastel plaster facades, flower boxes under the windows",
+          "kontrolle": true
+        },
+        {
+          "id": "strasse2-a",
+          "label": "Großstadtstraße (a)",
+          "wortlaut": "a city sidewalk in front of an angled corner storefront, glass office buildings and blurred street life receding diagonally"
+        },
+        {
+          "id": "strasse2-b",
+          "label": "Großstadtstraße (b)",
+          "wortlaut": "an urban street corner seen from the sidewalk, glass and stone facades at an oblique angle, distant traffic"
+        },
+        {
+          "id": "strasse2-k",
+          "label": "Großstadtstraße (bisherig)",
+          "wortlaut": "a downtown street between tall office buildings, crosswalk markings on the asphalt",
+          "kontrolle": true
+        },
+        {
+          "id": "bib2-a",
+          "label": "Bibliothek (a)",
+          "wortlaut": "a quiet corner of an old library with an angled wooden bookcase, a rolling ladder on one side and a reading table"
+        },
+        {
+          "id": "bib2-b",
+          "label": "Bibliothek (b)",
+          "wortlaut": "an old library alcove seen at an angle, tall wooden bookshelves, a leather armchair and warm reading lamps"
+        },
+        {
+          "id": "bib2-k",
+          "label": "Bibliothek (bisherig)",
+          "wortlaut": "a library with floor-to-ceiling wooden bookshelves and a rolling ladder",
+          "kontrolle": true
+        }
+      ]
+    }
+  ]
+}

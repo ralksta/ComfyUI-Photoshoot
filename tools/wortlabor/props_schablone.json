@@ -1,0 +1,38 @@
+{
+  "_comment": [
+    "Wording lab: test the universal prop grip templates with arbitrary user",
+    "objects (vintage Leica camera, leather handbag, closed red umbrella)",
+    "against plain 'holding ...' controls across three seeds."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Requisiten-Schablone",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "2:3",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Halbtotale", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Requisiten-Schablone",
+      "slot": "pose",
+      "zusatz": {"feld": "arme", "preset": ["haltung/Stehend", "koerper/Frontal zur Kamera"]},
+      "kandidaten": [
+        {"id": "kamera-a", "label": "Kamera (Schablone)",
+         "wortlaut": "holding a vintage silver Leica camera with both hands in front of her chest"},
+        {"id": "kamera-k", "label": "Kamera (Schablone)", "kontrolle": true,
+         "wortlaut": "holding a vintage silver Leica camera"},
+
+        {"id": "tasche-a", "label": "Handtasche (Schablone)",
+         "wortlaut": "holding a small black leather handbag in one hand at waist height, the other arm relaxed"},
+        {"id": "tasche-k", "label": "Handtasche (Schablone)", "kontrolle": true,
+         "wortlaut": "holding a small black leather handbag"},
+
+        {"id": "schirm-a", "label": "Regenschirm (Schablone)",
+         "wortlaut": "holding a closed red umbrella in one hand at chest height, the other arm relaxed"},
+        {"id": "schirm-k", "label": "Regenschirm (Schablone)", "kontrolle": true,
+         "wortlaut": "holding a closed red umbrella"}
+      ]
+    }
+  ]
+}
