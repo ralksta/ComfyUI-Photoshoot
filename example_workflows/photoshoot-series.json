@@ -1,0 +1,2009 @@
+{
+  "id": "krea2-photoshoot-example",
+  "revision": 0,
+  "last_node_id": 95,
+  "last_link_id": 22,
+  "nodes": [
+    {
+      "id": 90,
+      "type": "MarkdownNote",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        340,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Models.** Krea 2 Turbo, its Qwen3-VL text encoder and the Qwen-Image VAE, under the Comfy-Org file names. Flux or SD 3.5 work too - pick your own files here. **LoRA:** pick your file in the loader below, then Ctrl+B to switch it on, and put its trigger word into *LoRA trigger* (a person) or the prompt template (a style). More LoRAs: chain further loaders."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "krea2_turbo_fp8_scaled.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Krea-2/resolve/main/diffusion_models/krea2_turbo_fp8_scaled.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "title": "Krea 2 model",
+      "widgets_values": [
+        "krea2_turbo_fp8_scaled.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        40,
+        340
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_4b_fp8_scaled.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Krea-2/resolve/main/text_encoders/qwen3vl_4b_fp8_scaled.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_4b_fp8_scaled.safetensors",
+        "krea2",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        480
+      ],
+      "size": [
+        340,
+        90
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "qwen_image_vae.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/Krea-2/resolve/main/vae/qwen_image_vae.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen_image_vae.safetensors"
+      ]
+    },
+    {
+      "id": 91,
+      "type": "MarkdownNote",
+      "pos": [
+        460,
+        60
+      ],
+      "size": [
+        880,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Who.** Build the person once and save her. Her clothes come from the **Wardrobe** on the left: outfits as tabs - she wears the open one, and the series changes through all of them."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 13,
+      "type": "Krea2Wardrobe",
+      "pos": [
+        460,
+        200
+      ],
+      "size": [
+        400,
+        160
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "garderobe",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Wardrobe",
+        "photoshootAnsicht": "kompakt",
+        "photoshootVollHoehe": 330,
+        "wardrobeState": "{\"outfits\": [{\"id\": \"mantel\", \"name\": \"Coat\", \"felder\": {\"top\": \"Ärmelloser Rollkragen\", \"topColor\": \"Schwarz\", \"hosiery\": \"Nackte Beine\", \"shoes\": \"Combat Boots\", \"shoesColor\": \"Schwarz\"}, \"texte\": {\"details\": \"wearing a charcoal wool coat\"}}, {\"id\": \"cafe\", \"name\": \"Café\", \"felder\": {\"top\": \"Bardot-Top\", \"topColor\": \"Creme\", \"bottom\": \"Plisseerock midi\", \"bottomColor\": \"Beige\", \"shoes\": \"Blockabsatz-Pumps\", \"shoesColor\": \"Schwarz\", \"prop\": \"Kaffeetasse\"}, \"texte\": {\"details\": \"\"}}], \"aktiv\": 0, \"sektion\": null, \"vorschauArt\": \"puppe\"}"
+      }
+    },
+    {
+      "id": 10,
+      "type": "Krea2PersonBuilder",
+      "pos": [
+        900,
+        200
+      ],
+      "size": [
+        440,
+        180
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "garderobe",
+          "type": "STRING",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "person",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 0
+        },
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "links": [
+            1
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2PersonBuilder",
+        "photoshootAnsicht": "kompakt",
+        "photoshootVollHoehe": 430,
+        "personState": "{\"felder\": {\"gender\": \"Frau\", \"age\": \"Ende 20\", \"ethnicity\": \"Skandinavisch\", \"skinTone\": \"Sehr hell\", \"complexion\": \"Natürliche Poren\", \"height\": \"Groß\", \"figure\": \"Athletisch\", \"shoulders\": \"Sportlich\", \"hair\": \"Lange Wellen\", \"hairColor\": \"Rot / Kupfer\", \"eyeShape\": \"Mandelförmig\", \"eyes\": \"Graugrün\", \"cheekbones\": \"Hoch betont\", \"nose\": \"Gerade\", \"lipColor\": \"Altrosa\", \"lipFinish\": \"Matt\"}, \"mehrfach\": {\"skinFeatures\": [\"Sommersprossen\"]}, \"texte\": {\"ageExact\": \"\", \"details\": \"\"}, \"sektion\": null, \"gruppe\": {\"shoes\": \"alle\"}}"
+      }
+    },
+    {
+      "id": 92,
+      "type": "MarkdownNote",
+      "pos": [
+        1420,
+        60
+      ],
+      "size": [
+        400,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Look.** Scene, light and style stay the same for the whole series. **Black & white?** Pick it under *Look* in the style node, then switch on *Monochrome* in step 5 (Ctrl+B)."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 20,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        1420,
+        200
+      ],
+      "size": [
+        400,
+        140
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "title": "scene",
+      "widgets_values": [
+        "a sunlit loft with tall windows, wooden floor, plants in the corner"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "Krea2LightingBuilder",
+      "pos": [
+        1420,
+        380
+      ],
+      "size": [
+        400,
+        210
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "licht",
+          "type": "STRING",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2LightingBuilder",
+        "photoshootAnsicht": "kompakt",
+        "lightingState": "{\"felder\": {\"setup\": \"Softbox diffuses Licht\", \"richtung\": \"Frontal 45°\", \"atmosphaere\": \"Klar & gestochen scharf\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}"
+      },
+      "widgets_values": [
+        0,
+        "fixed"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Krea2StyleBuilder",
+      "pos": [
+        1420,
+        640
+      ],
+      "size": [
+        400,
+        190
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "stil",
+          "type": "STRING",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2StyleBuilder",
+        "photoshootAnsicht": "kompakt",
+        "styleState": "{\"felder\": {\"look\": \"—\", \"genre\": \"Editorial\", \"optik\": \"85mm f/1.4\", \"finish\": \"—\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}"
+      },
+      "widgets_values": [
+        0,
+        "fixed"
+      ]
+    },
+    {
+      "id": 93,
+      "type": "MarkdownNote",
+      "pos": [
+        1900,
+        60
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**The shoot.** Press **Start shooting** inside the node - not Queue. The axes vary framing, pose, expression, outfit and ratio; the contact sheet shows the photos. **Draft** first, then **Finish favourites**. [All controls](https://github.com/ralksta/ComfyUI-Photoshoot/blob/main/docs/nodes.md)"
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 11,
+      "type": "Krea2Photoshooting",
+      "pos": [
+        1900,
+        200
+      ],
+      "size": [
+        440,
+        530
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "link": 1,
+          "widget": {
+            "name": "person_data"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pose",
+          "type": "STRING",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "ausdruck",
+          "type": "STRING",
+          "links": [
+            5
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "kamera",
+          "type": "STRING",
+          "links": [
+            6
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            7
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            8
+          ],
+          "slot_index": 4
+        },
+        {
+          "name": "bildseed",
+          "type": "INT",
+          "links": [
+            9
+          ],
+          "slot_index": 5
+        },
+        {
+          "name": "person",
+          "type": "STRING",
+          "links": [
+            3
+          ],
+          "slot_index": 6
+        },
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 7
+        },
+        {
+          "name": "kamera_label",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 8
+        },
+        {
+          "name": "refine",
+          "type": "BOOLEAN",
+          "links": [
+            20
+          ],
+          "slot_index": 9
+        },
+        {
+          "name": "dateiname",
+          "type": "STRING",
+          "links": [
+            21
+          ],
+          "slot_index": 10
+        },
+        {
+          "name": "caption",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 11
+        },
+        {
+          "name": "foto",
+          "type": "INT",
+          "links": [],
+          "slot_index": 12
+        },
+        {
+          "name": "szene",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 13
+        },
+        {
+          "name": "licht",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 14
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 15
+        },
+        {
+          "name": "motion",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 16
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Photoshooting",
+        "photoshootAnsicht": "kompakt",
+        "photoshootVollHoehe": 1090
+      },
+      "widgets_values": [
+        1,
+        "increment"
+      ]
+    },
+    {
+      "id": 94,
+      "type": "MarkdownNote",
+      "pos": [
+        2420,
+        60
+      ],
+      "size": [
+        420,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Prompt.** The template sets the order of the blocks. Keep `{style}` first: a black & white look only wins at the front."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 22,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        2420,
+        200
+      ],
+      "size": [
+        420,
+        140
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            13
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "title": "prompt template",
+      "widgets_values": [
+        "{style}, {expression}, {camera}, {scene}, {lighting}, {person}, {pose}"
+      ]
+    },
+    {
+      "id": 30,
+      "type": "Krea2PromptJoin",
+      "pos": [
+        2420,
+        380
+      ],
+      "size": [
+        420,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "person_1",
+          "type": "STRING",
+          "link": 3
+        },
+        {
+          "name": "pose",
+          "type": "STRING",
+          "link": 4
+        },
+        {
+          "name": "ausdruck",
+          "type": "STRING",
+          "link": 5
+        },
+        {
+          "name": "kamera",
+          "type": "STRING",
+          "link": 6
+        },
+        {
+          "name": "lighting",
+          "type": "STRING",
+          "link": 10
+        },
+        {
+          "name": "szene",
+          "type": "STRING",
+          "link": 11
+        },
+        {
+          "name": "stil",
+          "type": "STRING",
+          "link": 12
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 13,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2PromptJoin"
+      }
+    },
+    {
+      "id": 95,
+      "type": "MarkdownNote",
+      "pos": [
+        2920,
+        60
+      ],
+      "size": [
+        440,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Render.** One node: double-click it to see the inside. Two passes, 8 steps and a 1.5x refine. **Draft** in the series switches the refine off: half the time, base resolution. *Monochrome* ships bypassed - select it and press Ctrl+B for true black & white."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 60,
+      "type": "498c07a6-08bf-5825-9f0a-18872c1cdc76",
+      "pos": [
+        2920,
+        220
+      ],
+      "size": [
+        440,
+        300
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 15
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 16
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 17,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 7,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 8,
+          "widget": {
+            "name": "height"
+          }
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 9,
+          "widget": {
+            "name": "seed"
+          }
+        },
+        {
+          "name": "refine",
+          "type": "BOOLEAN",
+          "link": 20,
+          "widget": {
+            "name": "refine"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        "",
+        1024,
+        1024,
+        0,
+        true
+      ]
+    },
+    {
+      "id": 52,
+      "type": "Krea2Monochrome",
+      "pos": [
+        2920,
+        570
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Monochrome"
+      },
+      "widgets_values": [
+        "Neutral",
+        1.0
+      ],
+      "color": "#5a2a15",
+      "bgcolor": "#8a4a25"
+    },
+    {
+      "id": 51,
+      "type": "SaveImage",
+      "pos": [
+        2920,
+        730
+      ],
+      "size": [
+        440,
+        540
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 19
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": 21,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "photoshoot/%date:yyyy-MM-dd%/series"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        40,
+        610
+      ],
+      "size": [
+        340,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "title": "optional LoRA - pick a file, then Ctrl+B",
+      "widgets_values": [
+        "your-lora.safetensors",
+        1.0
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      10,
+      1,
+      11,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      13,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      3,
+      11,
+      6,
+      30,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      11,
+      0,
+      30,
+      1,
+      "STRING"
+    ],
+    [
+      5,
+      11,
+      1,
+      30,
+      2,
+      "STRING"
+    ],
+    [
+      6,
+      11,
+      2,
+      30,
+      3,
+      "STRING"
+    ],
+    [
+      7,
+      11,
+      3,
+      60,
+      4,
+      "INT"
+    ],
+    [
+      8,
+      11,
+      4,
+      60,
+      5,
+      "INT"
+    ],
+    [
+      9,
+      11,
+      5,
+      60,
+      6,
+      "INT"
+    ],
+    [
+      10,
+      12,
+      0,
+      30,
+      4,
+      "STRING"
+    ],
+    [
+      11,
+      20,
+      0,
+      30,
+      5,
+      "STRING"
+    ],
+    [
+      12,
+      21,
+      0,
+      30,
+      6,
+      "STRING"
+    ],
+    [
+      13,
+      22,
+      0,
+      30,
+      7,
+      "STRING"
+    ],
+    [
+      14,
+      4,
+      0,
+      60,
+      0,
+      "MODEL"
+    ],
+    [
+      15,
+      2,
+      0,
+      60,
+      1,
+      "CLIP"
+    ],
+    [
+      16,
+      3,
+      0,
+      60,
+      2,
+      "VAE"
+    ],
+    [
+      17,
+      30,
+      0,
+      60,
+      3,
+      "STRING"
+    ],
+    [
+      18,
+      60,
+      0,
+      52,
+      0,
+      "IMAGE"
+    ],
+    [
+      19,
+      52,
+      0,
+      51,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      11,
+      9,
+      60,
+      7,
+      "BOOLEAN"
+    ],
+    [
+      21,
+      11,
+      10,
+      51,
+      1,
+      "STRING"
+    ],
+    [
+      22,
+      1,
+      0,
+      4,
+      0,
+      "MODEL"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "0 · Models",
+      "bounding": [
+        10,
+        -10,
+        400,
+        780
+      ],
+      "color": "#3f5159",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "1 · Who",
+      "bounding": [
+        430,
+        -10,
+        940,
+        420
+      ],
+      "color": "#593f5f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "2 · Look",
+      "bounding": [
+        1390,
+        -10,
+        460,
+        870
+      ],
+      "color": "#5f3f4f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "3 · The shoot",
+      "bounding": [
+        1870,
+        -10,
+        500,
+        770
+      ],
+      "color": "#5f4f3f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "4 · Prompt",
+      "bounding": [
+        2390,
+        -10,
+        480,
+        720
+      ],
+      "color": "#4f5f3f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "5 · Render",
+      "bounding": [
+        2890,
+        -10,
+        500,
+        1310
+      ],
+      "color": "#3f5f44",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "definitions": {
+    "subgraphs": [
+      {
+        "id": "498c07a6-08bf-5825-9f0a-18872c1cdc76",
+        "version": 1,
+        "state": {
+          "lastGroupId": 3,
+          "lastNodeId": 99,
+          "lastLinkId": 22,
+          "lastRerouteId": 0
+        },
+        "revision": 0,
+        "config": {},
+        "name": "Render (2 passes)",
+        "inputNode": {
+          "id": -10,
+          "bounding": [
+            -220,
+            160,
+            150,
+            200
+          ]
+        },
+        "outputNode": {
+          "id": -20,
+          "bounding": [
+            1560,
+            160,
+            130,
+            60
+          ]
+        },
+        "inputs": [
+          {
+            "id": "98322410-bb6e-555e-8c6f-234a8c788719",
+            "name": "model",
+            "type": "MODEL",
+            "linkIds": [
+              1,
+              2
+            ],
+            "pos": [
+              -90,
+              190
+            ]
+          },
+          {
+            "id": "693e7a99-5b6e-5695-9591-e5e945a4b63e",
+            "name": "clip",
+            "type": "CLIP",
+            "linkIds": [
+              3
+            ],
+            "pos": [
+              -90,
+              210
+            ]
+          },
+          {
+            "id": "ec49ba8d-9a09-5df8-b566-9f15c9b52638",
+            "name": "vae",
+            "type": "VAE",
+            "linkIds": [
+              4
+            ],
+            "pos": [
+              -90,
+              230
+            ]
+          },
+          {
+            "id": "79f04aba-499f-5379-a3c8-52f6ec2a80b5",
+            "name": "prompt",
+            "type": "STRING",
+            "linkIds": [
+              5
+            ],
+            "pos": [
+              -90,
+              250
+            ]
+          },
+          {
+            "id": "8ac9db31-b743-5593-a47b-fa5e500cda3a",
+            "name": "width",
+            "type": "INT",
+            "linkIds": [
+              6
+            ],
+            "pos": [
+              -90,
+              270
+            ]
+          },
+          {
+            "id": "94782f5c-dd9f-5935-ac68-bb381ff7f7c9",
+            "name": "height",
+            "type": "INT",
+            "linkIds": [
+              7
+            ],
+            "pos": [
+              -90,
+              290
+            ]
+          },
+          {
+            "id": "55966897-afb2-5b7d-ad14-3b3ece439af0",
+            "name": "seed",
+            "type": "INT",
+            "linkIds": [
+              8,
+              9
+            ],
+            "pos": [
+              -90,
+              310
+            ]
+          },
+          {
+            "id": "6c13e3d8-77ff-522f-a1a0-cf8176034064",
+            "name": "refine",
+            "type": "BOOLEAN",
+            "linkIds": [
+              10
+            ],
+            "pos": [
+              -90,
+              330
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "62141f20-214c-5063-8718-debe0249b3df",
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "linkIds": [
+              22
+            ],
+            "pos": [
+              1580,
+              190
+            ]
+          }
+        ],
+        "widgets": [],
+        "nodes": [
+          {
+            "id": 99,
+            "type": "MarkdownNote",
+            "pos": [
+              40,
+              -100
+            ],
+            "size": [
+              1420,
+              90
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [],
+            "properties": {
+              "Node name for S&R": "MarkdownNote"
+            },
+            "title": "read me",
+            "widgets_values": [
+              "**Inside the render node.** Pass 1: 8 steps at the size the series asks for. Pass 2: a 1.5x upscale, refined at denoise 0.44. **refine** off skips pass 2 - the series turns it off for a draft. The negative is empty on purpose (CFG 1). Change sampler settings here; the series only sets size, seed and refine."
+            ],
+            "color": "#2b2b2b",
+            "bgcolor": "#1f1f1f"
+          },
+          {
+            "id": 31,
+            "type": "CLIPTextEncode",
+            "pos": [
+              40,
+              160
+            ],
+            "size": [
+              340,
+              220
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "clip",
+                "type": "CLIP",
+                "link": 3
+              },
+              {
+                "name": "text",
+                "type": "STRING",
+                "link": 5,
+                "widget": {
+                  "name": "text"
+                }
+              }
+            ],
+            "outputs": [
+              {
+                "name": "CONDITIONING",
+                "type": "CONDITIONING",
+                "links": [
+                  11,
+                  12,
+                  13
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "CLIPTextEncode"
+            },
+            "widgets_values": [
+              ""
+            ]
+          },
+          {
+            "id": 32,
+            "type": "ConditioningZeroOut",
+            "pos": [
+              40,
+              420
+            ],
+            "size": [
+              340,
+              90
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "conditioning",
+                "type": "CONDITIONING",
+                "link": 13
+              }
+            ],
+            "outputs": [
+              {
+                "name": "CONDITIONING",
+                "type": "CONDITIONING",
+                "links": [
+                  14,
+                  15
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "ConditioningZeroOut"
+            },
+            "title": "negative = empty"
+          },
+          {
+            "id": 33,
+            "type": "EmptySD3LatentImage",
+            "pos": [
+              40,
+              550
+            ],
+            "size": [
+              340,
+              130
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "width",
+                "type": "INT",
+                "link": 6,
+                "widget": {
+                  "name": "width"
+                }
+              },
+              {
+                "name": "height",
+                "type": "INT",
+                "link": 7,
+                "widget": {
+                  "name": "height"
+                }
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  16
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "EmptySD3LatentImage"
+            },
+            "widgets_values": [
+              1024,
+              1024,
+              1
+            ]
+          },
+          {
+            "id": 40,
+            "type": "KSampler",
+            "pos": [
+              420,
+              160
+            ],
+            "size": [
+              340,
+              280
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 1
+              },
+              {
+                "name": "seed",
+                "type": "INT",
+                "link": 8,
+                "widget": {
+                  "name": "seed"
+                }
+              },
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 11
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 14
+              },
+              {
+                "name": "latent_image",
+                "type": "LATENT",
+                "link": 16
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  17,
+                  19
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "KSampler"
+            },
+            "title": "pass 1 — 8 steps",
+            "widgets_values": [
+              0,
+              "fixed",
+              8,
+              1.0,
+              "euler",
+              "simple",
+              1.0
+            ]
+          },
+          {
+            "id": 41,
+            "type": "LatentUpscaleBy",
+            "pos": [
+              420,
+              480
+            ],
+            "size": [
+              340,
+              120
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "samples",
+                "type": "LATENT",
+                "link": 17
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  18
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "LatentUpscaleBy"
+            },
+            "widgets_values": [
+              "bislerp",
+              1.5
+            ]
+          },
+          {
+            "id": 42,
+            "type": "KSampler",
+            "pos": [
+              800,
+              160
+            ],
+            "size": [
+              340,
+              280
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 2
+              },
+              {
+                "name": "seed",
+                "type": "INT",
+                "link": 9,
+                "widget": {
+                  "name": "seed"
+                }
+              },
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 12
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 15
+              },
+              {
+                "name": "latent_image",
+                "type": "LATENT",
+                "link": 18
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  20
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "KSampler"
+            },
+            "title": "pass 2 — refine at 0.44",
+            "widgets_values": [
+              0,
+              "fixed",
+              4,
+              1.0,
+              "euler_ancestral",
+              "simple",
+              0.44
+            ]
+          },
+          {
+            "id": 43,
+            "type": "ComfySwitchNode",
+            "pos": [
+              800,
+              480
+            ],
+            "size": [
+              340,
+              110
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "on_false",
+                "type": "LATENT",
+                "link": 19
+              },
+              {
+                "name": "on_true",
+                "type": "LATENT",
+                "link": 20
+              },
+              {
+                "name": "switch",
+                "type": "BOOLEAN",
+                "link": 10
+              }
+            ],
+            "outputs": [
+              {
+                "name": "output",
+                "type": "COMFY_MATCHTYPE_V3",
+                "links": [
+                  21
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "ComfySwitchNode"
+            },
+            "title": "refine? (off = pass 1 only)",
+            "widgets_values": [
+              true
+            ]
+          },
+          {
+            "id": 50,
+            "type": "VAEDecode",
+            "pos": [
+              1180,
+              160
+            ],
+            "size": [
+              280,
+              90
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 4
+              },
+              {
+                "name": "samples",
+                "type": "LATENT",
+                "link": 21
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  22
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAEDecode"
+            }
+          }
+        ],
+        "groups": [
+          {
+            "id": 1,
+            "title": "Conditioning & size",
+            "bounding": [
+              10,
+              90,
+              400,
+              620
+            ],
+            "color": "#3f5f44",
+            "font_size": 24,
+            "flags": {}
+          },
+          {
+            "id": 2,
+            "title": "Two passes",
+            "bounding": [
+              390,
+              90,
+              780,
+              540
+            ],
+            "color": "#3f5f44",
+            "font_size": 24,
+            "flags": {}
+          },
+          {
+            "id": 3,
+            "title": "Decode",
+            "bounding": [
+              1150,
+              90,
+              340,
+              190
+            ],
+            "color": "#3f4f5f",
+            "font_size": 24,
+            "flags": {}
+          }
+        ],
+        "links": [
+          {
+            "id": 1,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 40,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 2,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 42,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 3,
+            "origin_id": -10,
+            "origin_slot": 1,
+            "target_id": 31,
+            "target_slot": 0,
+            "type": "CLIP"
+          },
+          {
+            "id": 4,
+            "origin_id": -10,
+            "origin_slot": 2,
+            "target_id": 50,
+            "target_slot": 0,
+            "type": "VAE"
+          },
+          {
+            "id": 5,
+            "origin_id": -10,
+            "origin_slot": 3,
+            "target_id": 31,
+            "target_slot": 1,
+            "type": "STRING"
+          },
+          {
+            "id": 6,
+            "origin_id": -10,
+            "origin_slot": 4,
+            "target_id": 33,
+            "target_slot": 0,
+            "type": "INT"
+          },
+          {
+            "id": 7,
+            "origin_id": -10,
+            "origin_slot": 5,
+            "target_id": 33,
+            "target_slot": 1,
+            "type": "INT"
+          },
+          {
+            "id": 8,
+            "origin_id": -10,
+            "origin_slot": 6,
+            "target_id": 40,
+            "target_slot": 1,
+            "type": "INT"
+          },
+          {
+            "id": 9,
+            "origin_id": -10,
+            "origin_slot": 6,
+            "target_id": 42,
+            "target_slot": 1,
+            "type": "INT"
+          },
+          {
+            "id": 10,
+            "origin_id": -10,
+            "origin_slot": 7,
+            "target_id": 43,
+            "target_slot": 2,
+            "type": "BOOLEAN"
+          },
+          {
+            "id": 11,
+            "origin_id": 31,
+            "origin_slot": 0,
+            "target_id": 40,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 12,
+            "origin_id": 31,
+            "origin_slot": 0,
+            "target_id": 42,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 13,
+            "origin_id": 31,
+            "origin_slot": 0,
+            "target_id": 32,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 14,
+            "origin_id": 32,
+            "origin_slot": 0,
+            "target_id": 40,
+            "target_slot": 3,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 15,
+            "origin_id": 32,
+            "origin_slot": 0,
+            "target_id": 42,
+            "target_slot": 3,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 16,
+            "origin_id": 33,
+            "origin_slot": 0,
+            "target_id": 40,
+            "target_slot": 4,
+            "type": "LATENT"
+          },
+          {
+            "id": 17,
+            "origin_id": 40,
+            "origin_slot": 0,
+            "target_id": 41,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 18,
+            "origin_id": 41,
+            "origin_slot": 0,
+            "target_id": 42,
+            "target_slot": 4,
+            "type": "LATENT"
+          },
+          {
+            "id": 19,
+            "origin_id": 40,
+            "origin_slot": 0,
+            "target_id": 43,
+            "target_slot": 0,
+            "type": "LATENT"
+          },
+          {
+            "id": 20,
+            "origin_id": 42,
+            "origin_slot": 0,
+            "target_id": 43,
+            "target_slot": 1,
+            "type": "LATENT"
+          },
+          {
+            "id": 21,
+            "origin_id": 43,
+            "origin_slot": 0,
+            "target_id": 50,
+            "target_slot": 1,
+            "type": "LATENT"
+          },
+          {
+            "id": 22,
+            "origin_id": 50,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "IMAGE"
+          }
+        ],
+        "extra": {}
+      }
+    ]
+  },
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6,
+      "offset": [
+        80,
+        60
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -1,0 +1,876 @@
+"""
+Building-block store - keep persons, scenes and styles around and reuse them,
+plus a node that substitutes them into a prompt.
+
+Save / load (one pair per store, same handling):
+
+  Save / load person   ComfyUI/user/krea2_persons/
+  Save / load scene    ComfyUI/user/krea2_scenes/
+  Save / load style    ComfyUI/user/krea2_styles/
+
+For the person pair the text arrives over a wire from the Person Builder; for
+scene and style you type it straight into the node - hence a multiline field
+there instead of a forced input.
+
+Assembling:
+
+  Build prompt   Substitutes {person1} {person2} {person3} {kamera} {pose}
+                 {ausdruck} {szene} {stil} {extra}. Recommended order:
+                 {kamera}, {szene}, {person}, {pose}, {extra}, {ausdruck},
+                 {stil} - framing and room before the person. {extra} is for
+                 optional packs (empty means nothing).
+
+Note: the dropdowns are filled when ComfyUI asks for the node info. A freshly
+saved block therefore only shows up after a refresh (R).
+"""
+
+import io
+import json
+import os
+import re
+import time
+import zipfile
+
+try:
+    import folder_paths
+except ImportError:
+    folder_paths = None
+
+# Optional override so multi-build setups (e.g. Comfy Desktop 1.2) can share
+# Photoshoot characters, presets, series and shoots across ComfyUI builds.
+BENUTZER_ENV = "PHOTOSHOOT_USER_DIR"
+
+
+def benutzer_ordner():
+    """Base directory for Photoshoot user data, or None outside ComfyUI."""
+    override = os.environ.get(BENUTZER_ENV, "").strip()
+    if override:
+        return os.path.abspath(os.path.expanduser(override))
+    if folder_paths is None:
+        return None
+    return folder_paths.get_user_directory()
+
+# A combo value, which the locale files cannot translate - hence both languages.
+LEER = "— nichts gespeichert / nothing saved —"
+
+# kind -> (subfolder, display name, field name, does the text arrive by wire?)
+#
+# "prompt" stores the fully assembled text - what falls out of the back of
+# "build prompt". That lets you keep a combination that worked under a name and
+# send it straight back into the engine later, without digging it out of the
+# image metadata.
+ARTEN = {
+    "person": ("krea2_persons", "Person", "person", True),
+    "szene":  ("krea2_scenes",  "Szene",  "szene",  False),
+    "stil":   ("krea2_styles",  "Stil",   "stil",   False),
+    "licht":  ("krea2_lights",  "Licht",  "licht",  False),
+    "prompt": ("krea2_prompts", "Prompt", "prompt", True),
+}
+
+# {extra}: a block from an optional add-on pack. This package knows only the
+# placeholder, never the content. With no pack and no wire it stays empty and
+# disappears during cleanup - existing workflows are unaffected.
+PLATZHALTER = ("person1", "person2", "person3", "kamera", "pose", "ausdruck",
+                "licht", "szene", "stil", "extra")
+
+# English spellings of the same placeholders. The interface may be in English,
+# and German placeholders in the prompt text are a stumbling block there. The
+# German ones stay valid - saved prompts keep working unchanged.
+ALIASE = {
+    "camera": "kamera",
+    "expression": "ausdruck",
+    "lighting": "licht",
+    "light": "licht",
+    "beleuchtung": "licht",
+    "scene": "szene",
+    "style": "stil",
+    # {person} without a digit means the first person: a common typo, and the
+    # obvious spelling when there is only one person anyway.
+    "person": "person1",
+}
+
+
+def _dir(art):
+    basis = benutzer_ordner()
+    if not basis:
+        raise RuntimeError("No ComfyUI user directory (set %s)" % BENUTZER_ENV)
+    pfad = os.path.join(basis, ARTEN[art][0])
+    os.makedirs(pfad, exist_ok=True)
+    return pfad
+
+
+def _safe_name(name):
+    """Reduce to what is safe to use as a file name.
+
+    Guards against "../" and directory separators - the name comes from a free
+    text field and would otherwise end up in a path unchecked.
+    """
+    name = re.sub(r"[^\w\s-]", "", (name or "").strip(), flags=re.UNICODE)
+    return re.sub(r"\s+", " ", name).strip()[:80]
+
+
+def _list(art):
+    try:
+        namen = [f[:-5] for f in os.listdir(_dir(art)) if f.endswith(".json")]
+    except OSError:
+        namen = []
+    return sorted(namen, key=str.lower)
+
+
+def _pfad(art, name):
+    """Path to the stored file - the name always goes through _safe_name.
+
+    On reads too: the name does come from a dropdown that ComfyUI checks
+    against the list, but a hand-built workflow walks straight past that. A
+    name that _safe_name empties out cannot hit a file.
+    """
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    return os.path.join(_dir(art), sauber + ".json")
+
+
+def _lese_datei(art, name):
+    with open(_pfad(art, name), "r", encoding="utf-8") as fh:
+        daten = json.load(fh)
+    return daten if isinstance(daten, dict) else {}
+
+
+def _read(art, name):
+    return _lese_datei(art, name).get("text", "")
+
+
+def _make_save(art):
+    _, titel, feld, per_kabel = ARTEN[art]
+
+    class Save:
+        @classmethod
+        def INPUT_TYPES(cls):
+            if per_kabel:
+                textfeld = ("STRING", {"forceInput": True})
+            else:
+                textfeld = ("STRING", {"multiline": True, "default": "",
+                                       "placeholder": "Text for this block"})
+            return {"required": {
+                feld: textfeld,
+                "name": ("STRING", {"default": "", "multiline": False,
+                                    "placeholder": "Name, e.g. library at night"}),
+                "speichern": ("BOOLEAN", {"default": False,
+                                          "label_on": "save", "label_off": "off"}),
+            }}
+
+        RETURN_TYPES = ("STRING",)
+        RETURN_NAMES = (feld,)
+        OUTPUT_TOOLTIPS = (f"Pass-through {titel.lower()} prompt text.",)
+        SEARCH_ALIASES = ["photoshoot", "save", "speichern", art, titel.lower()]
+        FUNCTION = "save"
+        CATEGORY = "Photoshoot"
+        DESCRIPTION = ("Legt den Text unter einem Namen ab. Schalter auf 'speichern' "
+                       "stellen, einmal ausfuehren, danach wieder aus. Neue Namen "
+                       "erscheinen im Lade-Node erst nach Refresh (R).")
+
+        # Without this nothing happens: ComfyUI pulls execution backwards from
+        # the output nodes. This node sits at the end of a dead branch - its
+        # output normally goes nowhere - and would quietly drop out of the
+        # execution plan. OUTPUT_NODE makes it a root node in its own right.
+        OUTPUT_NODE = True
+
+        # Otherwise ComfyUI serves the cached result for identical inputs and
+        # never gets round to writing at all.
+        @classmethod
+        def IS_CHANGED(cls, **kw):
+            return time.time() if kw.get("speichern") else False
+
+        def save(self, **kw):
+            text = kw.get(feld) or ""
+            name = kw.get("name")
+            if not kw.get("speichern"):
+                return (text,)
+
+            sauber = _safe_name(name)
+            if not sauber:
+                print("[Photoshoot %s] No usable name - nothing saved." % titel)
+                return (text,)
+            if not text.strip():
+                print("[Photoshoot %s] Empty text - nothing saved." % titel)
+                return (text,)
+
+            pfad = _pfad(art, sauber)
+            neu = not os.path.exists(pfad)
+            with open(pfad, "w", encoding="utf-8") as fh:
+                json.dump({"name": sauber, "art": art, "text": text,
+                           "gespeichert": time.strftime("%Y-%m-%d %H:%M:%S")},
+                          fh, ensure_ascii=False, indent=2)
+
+            print("[Photoshoot %s] %s: %s" % (titel, "created" if neu else "updated", pfad))
+            return (text,)
+
+    Save.__name__ = "Krea2%sSave" % art.capitalize()
+    return Save
+
+
+def _make_load(art):
+    _, titel, feld, _ = ARTEN[art]
+
+    class Load:
+        @classmethod
+        def INPUT_TYPES(cls):
+            namen = _list(art)
+            return {"required": {feld: (namen if namen else [LEER],)}}
+
+        RETURN_TYPES = ("STRING",)
+        RETURN_NAMES = (feld,)
+        OUTPUT_TOOLTIPS = (f"Stored English prompt text of the selected {titel.lower()} block.",)
+        SEARCH_ALIASES = ["photoshoot", "load", "laden", art, titel.lower()]
+        FUNCTION = "load"
+        CATEGORY = "Photoshoot"
+        DESCRIPTION = "Gibt den Text eines gespeicherten Bausteins aus."
+
+        # If the file on disk changes, the node has to run again.
+        @classmethod
+        def IS_CHANGED(cls, **kw):
+            try:
+                return os.path.getmtime(_pfad(art, kw.get(feld)))
+            except (OSError, TypeError, ValueError):
+                return 0.0
+
+        def load(self, **kw):
+            name = kw.get(feld)
+            if not name or name == LEER:
+                return ("",)
+            try:
+                return (_read(art, name),)
+            except (OSError, ValueError) as e:
+                print("[Photoshoot %s] '%s' could not be read: %s" % (titel, name, e))
+                return ("",)
+
+    Load.__name__ = "Krea2%sLoad" % art.capitalize()
+    return Load
+
+
+KEINE = "—"
+
+
+def baustein_liste(art):
+    """Saved entries for one store kind as [{"name", "text", "state"?}], sorted by name."""
+    if art not in ARTEN:
+        raise ValueError("unknown block kind: %s" % art)
+    aus = []
+    for name in _list(art):
+        try:
+            daten = _lese_datei(art, name)
+        except (OSError, ValueError):
+            continue
+        text = daten.get("text")
+        state = daten.get("state")
+        hat_text = isinstance(text, str) and bool(text.strip())
+        hat_state = isinstance(state, dict) and bool(state)
+        if not hat_text and not hat_state:
+            continue
+        eintrag = {"name": name, "text": text if isinstance(text, str) else ""}
+        if isinstance(state, dict):
+            eintrag["state"] = state
+        aus.append(eintrag)
+    return aus
+
+
+def baustein_speichern(art, name, text="", state=None):
+    """Store a building block (text and optional builder state) under `name`."""
+    if art not in ARTEN:
+        raise ValueError("unknown block kind: %s" % art)
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    sauber_text = (text or "").strip() if isinstance(text, str) else ""
+    if not sauber_text and not (isinstance(state, dict) and state):
+        raise ValueError("empty block")
+    eintrag = {"name": sauber, "art": art, "text": sauber_text,
+               "gespeichert": time.strftime("%Y-%m-%d %H:%M:%S")}
+    if isinstance(state, dict):
+        eintrag["state"] = state
+    with open(_pfad(art, sauber), "w", encoding="utf-8") as fh:
+        json.dump(eintrag, fh, ensure_ascii=False, indent=2)
+    return sauber
+
+
+def baustein_loeschen(art, name):
+    """Remove a stored building block by `name` if it exists."""
+    if art not in ARTEN:
+        raise ValueError("unknown block kind: %s" % art)
+    pfad = _pfad(art, name)
+    if os.path.isfile(pfad):
+        os.remove(pfad)
+
+
+def szenen_liste():
+    """The saved scenes as [{"name", "text"}], sorted by name; unreadable
+    files are skipped. For the Location panel (route /krea2/szenen)."""
+    return [{"name": e["name"], "text": e["text"]} for e in baustein_liste("szene") if e["text"].strip()]
+
+
+# ----------------------------------------------------------- Saved series ---
+# The Series panel saves its settings under a name, next to the built-in
+# recipes: ComfyUI/user/krea2_series/<name>.json. Not a save/load node pair
+# like the blocks above - the series lives in the panel, so it is saved from
+# there, through the routes in api.py. Only these keys are kept; takes,
+# favourites and the chosen takes belong to one series run, not to its recipe.
+SERIEN_ORDNER = "krea2_series"
+SERIEN_SCHLUESSEL = ("anzahl", "start", "aktiv", "pools", "kameras", "fokusse",
+                     "festesFormat", "abdeckung", "reihenfolge", "bogen",
+                     "takesJeFoto", "groesse", "serienSeed", "perspektiven", "blick",
+                     "kameraOptik", "requisiten", "requisitText", "setFolge", "lichtFolge", "lichtPool")
+
+
+def _serien_dir():
+    basis = benutzer_ordner()
+    if not basis:
+        raise RuntimeError("No ComfyUI user directory (set %s)" % BENUTZER_ENV)
+    pfad = os.path.join(basis, SERIEN_ORDNER)
+    os.makedirs(pfad, exist_ok=True)
+    return pfad
+
+
+def serien_liste():
+    """Saved series as [{"name", "patch"}], sorted by name."""
+    aus = []
+    try:
+        dateien = sorted(f for f in os.listdir(_serien_dir()) if f.endswith(".json"))
+    except OSError:
+        return aus
+    for f in dateien:
+        try:
+            with open(os.path.join(_serien_dir(), f), "r", encoding="utf-8") as fh:
+                daten = json.load(fh)
+            aus.append({"name": f[:-5], "patch": daten.get("patch") or {}})
+        except (OSError, ValueError):
+            continue   # a broken file is skipped, not fatal
+    return sorted(aus, key=lambda x: x["name"].lower())
+
+
+def serie_speichern(name, patch):
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    patch = {k: v for k, v in (patch or {}).items() if k in SERIEN_SCHLUESSEL}
+    with open(os.path.join(_serien_dir(), sauber + ".json"), "w", encoding="utf-8") as fh:
+        json.dump({"patch": patch, "gespeichert": time.strftime("%Y-%m-%d %H:%M:%S")},
+                  fh, ensure_ascii=False, indent=1)
+    return sauber
+
+
+def serie_loeschen(name):
+    sauber = _safe_name(name)
+    pfad = os.path.join(_serien_dir(), sauber + ".json")
+    if sauber and os.path.isfile(pfad):
+        os.remove(pfad)
+
+
+# ------------------------------------------------------- Character cards ---
+# Complete character cards (Person Builder state + Wardrobe state + optional
+# Character LoRA metadata) in ComfyUI/user/krea2_characters/<name>.json.
+# Loaded into Person 1 or Person 2 from Studio -> Person -> Casting-Deck.
+CHARAKTER_ORDNER = "krea2_characters"
+PORTRAIT_FORMATE = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png"}
+PORTRAIT_MAX_BYTES = 512 * 1024
+BACKUP_FORMAT = "photoshoot-backup/1"
+BACKUP_MAX_BYTES = 25 * 1024 * 1024
+BACKUP_DATEI_MAX_BYTES = 5 * 1024 * 1024
+BACKUP_ORDNER = (
+    CHARAKTER_ORDNER, "krea2_presets", SERIEN_ORDNER, "krea2_shoots",
+    "krea2_persons", "krea2_scenes", "krea2_styles", "krea2_lights", "krea2_prompts",
+)
+BACKUP_ERWEITERUNGEN = {".json", ".webp", ".jpg", ".jpeg", ".png"}
+
+
+def _bild_format(roh):
+    """Detect supported portrait image formats by magic bytes."""
+    if not isinstance(roh, (bytes, bytearray)):
+        return None
+    if len(roh) >= 12 and roh[:4] == b"RIFF" and roh[8:12] == b"WEBP":
+        return ".webp"
+    if len(roh) >= 3 and roh[:3] == b"\xff\xd8\xff":
+        return ".jpg"
+    if len(roh) >= 8 and roh[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    return None
+
+
+def _charakter_dir():
+    basis = benutzer_ordner()
+    if not basis:
+        raise RuntimeError("No ComfyUI user directory (set %s)" % BENUTZER_ENV)
+    pfad = os.path.join(basis, CHARAKTER_ORDNER)
+    os.makedirs(pfad, exist_ok=True)
+    return pfad
+
+
+def _charakter_pfad(name):
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    return os.path.join(_charakter_dir(), sauber + ".json")
+
+
+def _charakter_portrait_pfad(name):
+    """Return (path, content_type) of an existing portrait image, or (None, None)."""
+    sauber = _safe_name(name)
+    if not sauber:
+        return None, None
+    verz = _charakter_dir()
+    for ext, ctype in PORTRAIT_FORMATE.items():
+        pfad = os.path.join(verz, sauber + ext)
+        if os.path.isfile(pfad):
+            return pfad, ctype
+    return None, None
+
+
+def charakter_portrait_lesen(name):
+    """Return (bytes, content_type) for a character's portrait, or None."""
+    pfad, ctype = _charakter_portrait_pfad(name)
+    if not pfad:
+        return None
+    try:
+        with open(pfad, "rb") as fh:
+            return fh.read(), ctype
+    except OSError:
+        return None
+
+
+def charakter_portrait_speichern(name, roh_bytes):
+    """Validate and save a portrait thumbnail for character `name`."""
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    if not isinstance(roh_bytes, (bytes, bytearray)) or not roh_bytes:
+        raise ValueError("empty portrait image")
+    if len(roh_bytes) > PORTRAIT_MAX_BYTES:
+        raise ValueError("portrait image too large (max %d KB)" % (PORTRAIT_MAX_BYTES // 1024))
+    ext = _bild_format(roh_bytes)
+    if not ext or ext not in PORTRAIT_FORMATE:
+        raise ValueError("unsupported portrait format (use WebP, JPEG or PNG)")
+    charakter_portrait_loeschen(sauber)
+    pfad = os.path.join(_charakter_dir(), sauber + ext)
+    with open(pfad, "wb") as fh:
+        fh.write(roh_bytes)
+    return sauber
+
+
+def charakter_portrait_loeschen(name):
+    """Delete any stored portrait image for character `name`."""
+    sauber = _safe_name(name)
+    if not sauber:
+        return
+    verz = _charakter_dir()
+    for ext in PORTRAIT_FORMATE:
+        pfad = os.path.join(verz, sauber + ext)
+        if os.path.isfile(pfad):
+            try:
+                os.remove(pfad)
+            except OSError:
+                pass
+
+
+def charakter_liste():
+    """Saved character cards as [{"name", "summary", "person", "wardrobe", "lora", "gespeichert", "portrait"}],
+    newest first (falling back to name)."""
+    aus = []
+    try:
+        dateien = sorted(f for f in os.listdir(_charakter_dir()) if f.endswith(".json"))
+    except OSError:
+        return aus
+    for f in dateien:
+        try:
+            with open(os.path.join(_charakter_dir(), f), "r", encoding="utf-8") as fh:
+                daten = json.load(fh)
+            if not isinstance(daten, dict):
+                continue
+            name = f[:-5]
+            lora = daten.get("lora") if isinstance(daten.get("lora"), dict) else {}
+            p_pfad, _ = _charakter_portrait_pfad(name)
+            portrait = int(os.path.getmtime(p_pfad)) if p_pfad else 0
+            aus.append({
+                "name": name,
+                "summary": str(daten.get("summary") or "")[:200],
+                "person": daten.get("person") if isinstance(daten.get("person"), dict) else {},
+                "wardrobe": daten.get("wardrobe") if isinstance(daten.get("wardrobe"), dict) else {},
+                "lora": {
+                    "name": str(lora.get("name") or "").strip(),
+                    "strength": float(lora.get("strength", 1.0)) if lora.get("name") else 1.0,
+                },
+                "gespeichert": str(daten.get("gespeichert") or ""),
+                "portrait": portrait,
+            })
+        except (OSError, ValueError, TypeError):
+            continue
+    return sorted(aus, key=lambda x: (x["gespeichert"], x["name"].lower()), reverse=True)
+
+
+def charakter_speichern(name, daten):
+    """Save or overwrite a character card under `name`."""
+    sauber = _safe_name(name)
+    if not sauber:
+        raise ValueError("unusable name")
+    daten = daten if isinstance(daten, dict) else {}
+    person = daten.get("person") if isinstance(daten.get("person"), dict) else {}
+    wardrobe = daten.get("wardrobe") if isinstance(daten.get("wardrobe"), dict) else {}
+    if not person and not wardrobe:
+        raise ValueError("empty character card")
+    lora_roh = daten.get("lora") if isinstance(daten.get("lora"), dict) else {}
+    lora_name = str(lora_roh.get("name") or "").strip()
+    try:
+        lora_strength = round(max(-5.0, min(5.0, float(lora_roh.get("strength", 1.0)))), 3)
+    except (TypeError, ValueError):
+        lora_strength = 1.0
+    karte = {
+        "name": sauber,
+        "summary": str(daten.get("summary") or "").strip()[:200],
+        "person": person,
+        "wardrobe": wardrobe,
+        "lora": {"name": lora_name, "strength": lora_strength} if lora_name else {},
+        "gespeichert": time.strftime("%Y-%m-%d %H:%M"),
+    }
+    with open(_charakter_pfad(sauber), "w", encoding="utf-8") as fh:
+        json.dump(karte, fh, ensure_ascii=False, indent=2)
+    return sauber
+
+
+def charakter_loeschen(name):
+    """Remove a stored character card and its portrait by `name` if it exists."""
+    pfad = _charakter_pfad(name)
+    if os.path.isfile(pfad):
+        os.remove(pfad)
+    charakter_portrait_loeschen(name)
+
+
+# ------------------------------------------- Workspace status & backup ---
+def _zaehle_json(basis, ordner):
+    if not basis:
+        return 0
+    verz = os.path.join(basis, ordner)
+    try:
+        return sum(1 for f in os.listdir(verz) if f.endswith(".json") and os.path.isfile(os.path.join(verz, f)))
+    except OSError:
+        return 0
+
+
+def speicher_status():
+    """Return active Photoshoot user directory path and item counts across folders."""
+    basis = benutzer_ordner() or ""
+    blocks = sum(_zaehle_json(basis, o) for o in ("krea2_persons", "krea2_scenes", "krea2_styles", "krea2_lights", "krea2_prompts"))
+    counts = {
+        "characters": _zaehle_json(basis, CHARAKTER_ORDNER),
+        "presets": _zaehle_json(basis, "krea2_presets"),
+        "series": _zaehle_json(basis, SERIEN_ORDNER),
+        "shoots": _zaehle_json(basis, "krea2_shoots"),
+        "blocks": blocks,
+    }
+    return {
+        "folder": basis,
+        "custom_env": bool(os.environ.get(BENUTZER_ENV, "").strip()),
+        "env_var": BENUTZER_ENV,
+        "counts": counts,
+        "total": sum(counts.values()),
+    }
+
+
+def backup_erzeugen(version=""):
+    """Bundle all Photoshoot user data folders into a deterministic in-memory ZIP."""
+    basis = benutzer_ordner()
+    if not basis:
+        raise RuntimeError("No ComfyUI user directory (set %s)" % BENUTZER_ENV)
+    ordner_counts = {}
+    puffer = io.BytesIO()
+    with zipfile.ZipFile(puffer, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for ordner in BACKUP_ORDNER:
+            verz = os.path.join(basis, ordner)
+            if not os.path.isdir(verz):
+                continue
+            geschrieben = 0
+            for datei in sorted(os.listdir(verz)):
+                ext = os.path.splitext(datei)[1].lower()
+                if ext not in BACKUP_ERWEITERUNGEN:
+                    continue
+                voll = os.path.join(verz, datei)
+                if os.path.islink(voll) or not os.path.isfile(voll):
+                    continue
+                zf.write(voll, "%s/%s" % (ordner, datei))
+                geschrieben += 1
+            if geschrieben:
+                ordner_counts[ordner] = geschrieben
+        manifest = {
+            "format": BACKUP_FORMAT,
+            "version": str(version or ""),
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "counts": ordner_counts,
+        }
+        zf.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    return puffer.getvalue()
+
+
+def backup_einspielen(zip_bytes, ueberschreiben=False):
+    """Validate and restore a Photoshoot backup ZIP into the active user directory."""
+    basis = benutzer_ordner()
+    if not basis:
+        raise RuntimeError("No ComfyUI user directory (set %s)" % BENUTZER_ENV)
+    if not isinstance(zip_bytes, (bytes, bytearray)) or not zip_bytes:
+        raise ValueError("empty backup archive")
+    if len(zip_bytes) > BACKUP_MAX_BYTES:
+        raise ValueError("backup archive too large (max %d MB)" % (BACKUP_MAX_BYTES // (1024 * 1024)))
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(zip_bytes), "r")
+    except zipfile.BadZipFile as e:
+        raise ValueError("invalid ZIP archive: %s" % e) from e
+
+    imported = 0
+    skipped = 0
+    warnings = []
+    folders = {}
+    gesamt_bytes = 0
+
+    with zf:
+        for info in zf.infolist():
+            if info.is_dir():
+                continue
+            roh_name = info.filename.replace("\\", "/")
+            if roh_name == "manifest.json":
+                continue
+            # Reject symlinks, absolute paths, traversal, or nested subdirectories.
+            if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                warnings.append("skipped symlink: %s" % roh_name)
+                continue
+            if roh_name.startswith("/") or ".." in roh_name.split("/"):
+                warnings.append("rejected unsafe path: %s" % roh_name)
+                continue
+            teile = roh_name.split("/")
+            if len(teile) != 2:
+                warnings.append("skipped unexpected path: %s" % roh_name)
+                continue
+            ordner, datei = teile
+            if ordner not in BACKUP_ORDNER:
+                warnings.append("skipped unknown folder: %s" % roh_name)
+                continue
+            if not datei or datei in (".", "..") or any(ord(c) < 32 for c in datei):
+                warnings.append("rejected invalid filename: %s" % roh_name)
+                continue
+            ext = os.path.splitext(datei)[1].lower()
+            if ext not in BACKUP_ERWEITERUNGEN:
+                warnings.append("skipped unsupported file type: %s" % roh_name)
+                continue
+            if info.file_size > BACKUP_DATEI_MAX_BYTES:
+                warnings.append("skipped oversized file: %s" % roh_name)
+                continue
+            if gesamt_bytes + info.file_size > BACKUP_MAX_BYTES:
+                raise ValueError("extracted backup exceeds %d MB limit" % (BACKUP_MAX_BYTES // (1024 * 1024)))
+            raw = zf.read(info)
+            if len(raw) > BACKUP_DATEI_MAX_BYTES:
+                warnings.append("skipped oversized file: %s" % roh_name)
+                continue
+            gesamt_bytes += len(raw)
+            if gesamt_bytes > BACKUP_MAX_BYTES:
+                raise ValueError("extracted backup exceeds %d MB limit" % (BACKUP_MAX_BYTES // (1024 * 1024)))
+            if ext == ".json":
+                try:
+                    json.loads(raw.decode("utf-8"))
+                except (UnicodeDecodeError, ValueError):
+                    warnings.append("skipped invalid JSON: %s" % roh_name)
+                    continue
+            elif _bild_format(raw) is None:
+                warnings.append("skipped invalid image: %s" % roh_name)
+                continue
+
+            ziel_dir = os.path.join(basis, ordner)
+            ziel_pfad = os.path.join(ziel_dir, datei)
+            if os.path.exists(ziel_pfad) and not ueberschreiben:
+                skipped += 1
+                continue
+            os.makedirs(ziel_dir, exist_ok=True)
+            with open(ziel_pfad, "wb") as fh:
+                fh.write(raw)
+            imported += 1
+            folders[ordner] = folders.get(ordner, 0) + 1
+
+    return {"imported": imported, "skipped": skipped, "warnings": warnings, "folders": folders}
+
+
+class Krea2Bausteine:
+    """Four dropdowns, four outputs - replaces four separate load nodes."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        # Here every list needs an empty entry: unlike the separate nodes, a
+        # dropdown cannot simply be unplugged when you only want one person in
+        # the image.
+        personen = [KEINE] + _list("person")
+        return {"required": {
+            "person_1": (personen,),
+            "person_2": (personen,),
+            "szene": ([KEINE] + _list("szene"),),
+            "stil": ([KEINE] + _list("stil"),),
+        }}
+
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("person_1", "person_2", "szene", "stil")
+    OUTPUT_TOOLTIPS = (
+        "Stored text for Person 1 (empty when '—').",
+        "Stored text for Person 2 (empty when '—').",
+        "Stored scene text (empty when '—').",
+        "Stored style text (empty when '—').",
+    )
+    SEARCH_ALIASES = ["photoshoot", "blocks", "bausteine", "presets", "load"]
+    FUNCTION = "waehlen"
+    CATEGORY = "Photoshoot"
+    DESCRIPTION = ("Waehlt zwei Personen, eine Szene und einen Stil aus den "
+                   "gespeicherten Bausteinen. Neue Eintraege erscheinen erst "
+                   "nach Refresh (R).")
+
+    @classmethod
+    def IS_CHANGED(cls, person_1, person_2, szene, stil):
+        # If any of the four files on disk changes, run again.
+        stempel = []
+        for art, name in (("person", person_1), ("person", person_2),
+                          ("szene", szene), ("stil", stil)):
+            try:
+                stempel.append(os.path.getmtime(_pfad(art, name)))
+            except (OSError, TypeError, ValueError):
+                stempel.append(0.0)
+        return stempel
+
+    def _hole(self, art, name):
+        if not name or name == KEINE or name == LEER:
+            return ""
+        try:
+            return _read(art, name)
+        except (OSError, ValueError) as e:
+            print("[Photoshoot] '%s' could not be read: %s" % (name, e))
+            return ""
+
+    def waehlen(self, person_1, person_2, szene, stil):
+        return (self._hole("person", person_1), self._hole("person", person_2),
+                self._hole("szene", szene), self._hole("stil", stil))
+
+
+def _aufraeumen(text):
+    """Clean up the debris that placeholders left empty leave behind.
+
+    Without this the prompt reads " , , sitting on a desk", or a line with
+    nothing but a full stop left on it - both would otherwise reach the text
+    encoder.
+    """
+    zeilen = []
+    for zeile in text.splitlines():
+        z = re.sub(r"[ \t]+", " ", zeile).strip()
+        z = re.sub(r"(?:,\s*){2,}", ", ", z)   # ", , ," -> ", "
+        z = re.sub(r"\s+([,;.])", r"\1", z)    # " ," -> ","
+        z = re.sub(r",\s*(?=[.;:!?])", "", z)  # "a woman,." -> "a woman."
+        z = re.sub(r"\.\s*(?=\.)", "", z)      # ".." -> "."
+        z = re.sub(r"^[,;.\s]+", "", z)        # leading punctuation
+        zeilen.append("" if z in (",", ".", ";") else z)
+    text = "\n".join(zeilen)
+    text = re.sub(r"\n{3,}", "\n\n", text)     # collapse runs of blank lines
+    return text.strip().strip(",").strip()
+
+
+class Krea2PromptJoin:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {"text": ("STRING", {"forceInput": True})},
+            "optional": {
+                "person_1": ("STRING", {"forceInput": True}),
+                "person_2": ("STRING", {"forceInput": True}),
+                "person_3": ("STRING", {"forceInput": True}),
+                "kamera": ("STRING", {"forceInput": True}),
+                "pose": ("STRING", {"forceInput": True}),
+                "ausdruck": ("STRING", {"forceInput": True}),
+                "licht": ("STRING", {"forceInput": True}),
+                "lighting": ("STRING", {"forceInput": True}),
+                "szene": ("STRING", {"forceInput": True}),
+                "stil": ("STRING", {"forceInput": True}),
+                # A block from an optional add-on pack. This package does not
+                # know the content, only the {extra} placeholder.
+                "extra": ("STRING", {"forceInput": True}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("prompt",)
+    OUTPUT_TOOLTIPS = ("Final assembled prompt with placeholders replaced and stray commas cleaned up.",)
+    SEARCH_ALIASES = ["photoshoot", "build prompt", "join", "prompt bauen", "template", "vorlage"]
+    FUNCTION = "join"
+    CATEGORY = "Photoshoot"
+    DESCRIPTION = ("Ersetzt {person1} {person2} {person3} {kamera} {pose} {ausdruck} "
+                   "{licht} {szene} {stil} {extra}. Empfohlen: {stil}, {ausdruck}, {kamera}, "
+                   "{szene}, {licht}, {person}, {pose}, {extra}. {extra} optional für "
+                   "Erweiterungs-Packs. Ohne Platzhalter in derselben Reihenfolge.")
+
+    def join(self, text, person_1="", person_2="", person_3="", kamera="",
+             pose="", ausdruck="", licht="", lighting="", szene="", stil="", extra=""):
+        werte = {"person1": person_1 or "", "person2": person_2 or "",
+                 "person3": person_3 or "", "kamera": kamera or "",
+                 "pose": pose or "",
+                 "ausdruck": ausdruck or "",
+                 "licht": licht or lighting or "",
+                 "szene": szene or "", "stil": stil or "",
+                 "extra": extra or ""}
+        basis = text or ""
+
+        # Map the English spellings onto the internal names first, so that
+        # below there is only ever one set of placeholders.
+        for engl, intern in ALIASE.items():
+            basis = re.sub(r"\{%s\}" % engl, "{%s}" % intern, basis)
+
+        if any("{%s}" % p in basis for p in PLATZHALTER):
+            for p in PLATZHALTER:
+                basis = basis.replace("{%s}" % p, werte[p])
+        else:
+            # No placeholder: the recommended order. Style first - at the end
+            # a colour treatment did not take ("black and white photograph"
+            # there still came out in colour, at the front monochrome, the wide
+            # shot as wide as before, docs/measurements.md). The expression
+            # right after it: a mood only showed early and as the subject.
+            # Then framing, room and lighting before the person.
+            vorn = [werte[p] for p in ("stil", "ausdruck", "kamera", "szene", "licht",
+                                       "person1", "person2", "person3",
+                                       "pose", "extra") if werte[p]]
+            basis = ". ".join(vorn + ([basis] if basis.strip() else []))
+
+        prompt = _aufraeumen(basis)
+        # "ui" puts the finished prompt into ComfyUI's history for this run
+        # (execution.py keeps the ui of every node that runs, not only of
+        # output nodes, and a cached run hands its stored ui back), so the
+        # Series panel's contact sheet can show the prompt each photo got.
+        return {"ui": {"text": [prompt]}, "result": (prompt,)}
+
+
+# Die Klassen entstehen in der Schleife, die Namen stehen darunter ausgeschrieben.
+_KLASSEN = {art: (_make_save(art), _make_load(art)) for art in ARTEN}
+
+NODE_CLASS_MAPPINGS = {
+    "Krea2PersonSave": _KLASSEN["person"][0],
+    "Krea2PersonLoad": _KLASSEN["person"][1],
+    "Krea2SzeneSave":  _KLASSEN["szene"][0],
+    "Krea2SzeneLoad":  _KLASSEN["szene"][1],
+    "Krea2StilSave":   _KLASSEN["stil"][0],
+    "Krea2StilLoad":   _KLASSEN["stil"][1],
+    "Krea2LichtSave":  _KLASSEN["licht"][0],
+    "Krea2LichtLoad":  _KLASSEN["licht"][1],
+    "Krea2PromptSave": _KLASSEN["prompt"][0],
+    "Krea2PromptLoad": _KLASSEN["prompt"][1],
+    "Krea2Bausteine":  Krea2Bausteine,
+    "Krea2PromptJoin": Krea2PromptJoin,
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "Krea2PersonSave": "Photoshoot – Person speichern",
+    "Krea2PersonLoad": "Photoshoot – Person laden",
+    "Krea2SzeneSave":  "Photoshoot – Szene speichern",
+    "Krea2SzeneLoad":  "Photoshoot – Szene laden",
+    "Krea2StilSave":   "Photoshoot – Stil speichern",
+    "Krea2StilLoad":   "Photoshoot – Stil laden",
+    "Krea2LichtSave":  "Photoshoot – Licht speichern",
+    "Krea2LichtLoad":  "Photoshoot – Licht laden",
+    "Krea2PromptSave": "Photoshoot – Prompt speichern",
+    "Krea2PromptLoad": "Photoshoot – Prompt laden",
+    "Krea2Bausteine":  "Photoshoot – Bausteine wählen",
+    "Krea2PromptJoin": "Photoshoot – Prompt bauen",
+}

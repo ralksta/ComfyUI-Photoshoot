@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"
+     role="img" aria-label="Photoshoot">
+  <title>Photoshoot</title>
+  <rect x="0" y="0" width="128" height="128" rx="24" fill="#1b1d21"/>
+  <g transform="translate(24 24)">
+    <g fill="none" stroke="#8a8f98" stroke-width="3.2">
+      <rect x="0"  y="0"  width="30" height="42" rx="4"/>
+      <rect x="38" y="0"  width="42" height="42" rx="4"/>
+      <rect x="0"  y="50" width="42" height="30" rx="4"/>
+      <rect x="50" y="50" width="30" height="30" rx="4"/>
+    </g>
+    <rect x="38" y="0" width="42" height="42" rx="4" fill="#f66744"/>
+    <circle cx="59" cy="15" r="6" fill="#1b1d21"/>
+    <path d="M45 42 a14 14 0 0 1 28 0 z" fill="#1b1d21"/>
+  </g>
+</svg>

@@ -1,0 +1,130 @@
+{
+  "_comment": [
+    "Wording lab: candidate wordings for the selfie mode (docs/ROADMAP.md, F4),",
+    "rendered side by side by tools/wortlabor.py. Nothing here is a preset yet:",
+    "a wording moves into PRESETS only after the user's verdict on the sheets.",
+    "",
+    "basis: the example workflow's person, wardrobe, scene, lighting, style and",
+    "template (tools/baue_workflow.py), composed by the real builders. Each",
+    "candidate replaces one prompt slot (camera, expression, style or pose);",
+    "the group's 'feste' fill the other slots. A value is a text, or",
+    "{\"kandidat\": id} for another candidate's wording, {\"preset\": \"cat/Label\"}",
+    "for a built-in entry of the slot's builder, or {\"basis\": true} for what",
+    "the base puts into that slot. A candidate's own feste win over the group's",
+    "(the mirror selfies look at the screen, not into the lens). kontrolle marks",
+    "the bare-word control row. A group's zusatz composes builder fields with",
+    "each candidate of its slot, the candidate standing in for 'feld' - mood",
+    "and gaze in one expression, as a series sends them; \"zusatz\": null opts",
+    "a candidate out.",
+    "bildausschnitt is the framing label (nodes/shooting.py KAMERA): the person",
+    "block is shortened for it, and with kamera_mit_ausschnitt the camera slot",
+    "starts with the Series' wording for it, the camera value appended - the",
+    "way the planned Perspektive field will append to the framing (ROADMAP F4).",
+    "Groups A and B run without a style text, so no lens description competes",
+    "with the selfie; the example's editorial style is group C's control."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Selfie",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "9:16",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Porträt", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Perspektive",
+      "slot": "camera",
+      "feste": {"style": "",
+                "expression": {"preset": ["stimmung/Warmes Lächeln", "blick/In die Kamera"]}},
+      "kandidaten": [
+        {"id": "oben-a", "label": "Selfie von oben",
+         "wortlaut": "high-angle selfie, phone held at arm's length above her head, she looks up into the lens"},
+        {"id": "oben-b", "label": "Selfie von oben",
+         "wortlaut": "selfie taken from above, the camera tilted down at her face, her outstretched arm leading out of the frame"},
+        {"id": "oben-k", "label": "Selfie von oben", "kontrolle": true,
+         "wortlaut": "selfie from above"},
+
+        {"id": "unten-a", "label": "Selfie von unten",
+         "wortlaut": "low-angle selfie, phone held below her chin, she looks down into the lens"},
+        {"id": "unten-b", "label": "Selfie von unten",
+         "wortlaut": "selfie taken from below at arm's length, the camera tilted up at her face"},
+        {"id": "unten-k", "label": "Selfie von unten", "kontrolle": true,
+         "wortlaut": "selfie from below"},
+
+        {"id": "auge-a", "label": "Selfie auf Augenhöhe",
+         "wortlaut": "eye-level selfie at arm's length, one arm reaching toward the camera and out of the frame"},
+        {"id": "auge-b", "label": "Selfie auf Augenhöhe",
+         "wortlaut": "front-camera selfie, phone held straight in front of her face"},
+        {"id": "auge-k", "label": "Selfie auf Augenhöhe", "kontrolle": true,
+         "wortlaut": "selfie"},
+
+        {"id": "schulter-a", "label": "Selfie über die Schulter",
+         "wortlaut": "over-the-shoulder selfie, body turned away, looking back into the phone held beside her head"},
+        {"id": "schulter-b", "label": "Selfie über die Schulter",
+         "wortlaut": "selfie looking back over her shoulder, phone raised at her side"},
+        {"id": "schulter-k", "label": "Selfie über die Schulter", "kontrolle": true,
+         "wortlaut": "over-the-shoulder selfie"},
+
+        {"id": "liegend-a", "label": "Selfie im Liegen",
+         "wortlaut": "selfie lying on her back on a bed, phone held above her face, hair spread on the pillow"},
+        {"id": "liegend-b", "label": "Selfie im Liegen",
+         "wortlaut": "top-down selfie while lying down, her arm raised above her"},
+        {"id": "liegend-k", "label": "Selfie im Liegen", "kontrolle": true,
+         "wortlaut": "selfie lying in bed"},
+
+        {"id": "spiegel-a", "label": "Spiegel-Selfie", "bildausschnitt": "Ganzkörper",
+         "feste": {"expression": {"preset": "stimmung/Warmes Lächeln"}},
+         "wortlaut": "mirror selfie, full-body reflection in a tall mirror, holding a smartphone in front of her chest, looking at the phone screen"},
+        {"id": "spiegel-b", "label": "Spiegel-Selfie", "bildausschnitt": "Ganzkörper",
+         "feste": {"expression": {"preset": "stimmung/Warmes Lächeln"}},
+         "wortlaut": "mirror selfie in a full-length mirror, the phone covering part of her face"},
+        {"id": "spiegel-k", "label": "Spiegel-Selfie", "kontrolle": true, "bildausschnitt": "Ganzkörper",
+         "feste": {"expression": {"preset": "stimmung/Warmes Lächeln"}},
+         "wortlaut": "mirror selfie"}
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Selfie-Ausdruck",
+      "slot": "expression",
+      "zusatz": {"feld": "stimmung", "preset": ["blick/In die Kamera"]},
+      "feste": {"style": "",
+                "camera": {"kandidat": "auge-a"},
+                "expression": {"preset": ["stimmung/Warmes Lächeln", "blick/In die Kamera"]}},
+      "kandidaten": [
+        {"id": "kuss-a", "label": "Kussmund",
+         "wortlaut": "lips pursed into a kiss toward the camera"},
+        {"id": "kuss-b", "label": "Kussmund",
+         "wortlaut": "blowing a kiss at the camera"},
+        {"id": "schmoll-a", "label": "Schmollmund",
+         "wortlaut": "pouting lips, a playful duck face"},
+        {"id": "zunge-a", "label": "Zunge raus",
+         "wortlaut": "sticking her tongue out playfully, eyes squinting with laughter"},
+        {"id": "peace-a", "label": "Peace-Zeichen", "slot": "pose",
+         "wortlaut": "making a peace sign with two fingers next to her face"},
+        {"id": "augenrollen-a", "label": "Augenrollen",
+         "_comment": "No camera gaze: an eye roll looks away, and the Series never pairs a camera gaze with a mood that looks away.",
+         "zusatz": null,
+         "wortlaut": "rolling her eyes with a half smile"},
+        {"id": "lachen-k", "label": "Breites Lachen", "kontrolle": true,
+         "wortlaut": {"preset": "stimmung/Breites Lachen"}}
+      ]
+    },
+    {
+      "id": "C",
+      "titel": "Smartphone-Look",
+      "slot": "style",
+      "feste": {"camera": {"kandidat": "auge-a"},
+                "expression": {"preset": ["stimmung/Warmes Lächeln", "blick/In die Kamera"]}},
+      "kandidaten": [
+        {"id": "phone-a", "label": "Smartphone",
+         "wortlaut": "smartphone front-camera photo, slight wide-angle distortion, natural skin, casual social media snapshot"},
+        {"id": "phone-b", "label": "Smartphone",
+         "wortlaut": "shot on an iPhone, on-camera flash, candid, slightly overexposed"},
+        {"id": "editorial-k", "label": "Editorial", "kontrolle": true,
+         "wortlaut": {"basis": true}}
+      ]
+    }
+  ]
+}

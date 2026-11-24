@@ -1,0 +1,42 @@
+{
+  "_comment": [
+    "Wording lab round 2: steeper camera angle candidates for Group A",
+    "(Froschperspektive, Von oben, Vogelperspektive, Dutch Angle) after round 1",
+    "showed aufsicht-a standing upright and dutch-a missing seed 42."
+  ],
+
+  "format": "photoshoot-wortlabor/1",
+  "name": "Kamerawinkel Runde 2",
+  "seeds": [776610, 1401181143, 42],
+  "bildformat": "2:3",
+  "basis": {"von": "beispiel-workflow", "bildausschnitt": "Porträt", "kamera_mit_ausschnitt": true},
+
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Kamerawinkel Runde 2",
+      "slot": "camera",
+      "kandidaten": [
+        {"id": "frosch-b", "label": "Froschperspektive", "bildausschnitt": "Amerikanisch",
+         "wortlaut": "dramatic worm's-eye low-angle shot looking steeply upward from near the floor, ceiling and high window arches towering above her"},
+        {"id": "frosch-c", "label": "Froschperspektive", "bildausschnitt": "Amerikanisch",
+         "wortlaut": "extreme low-angle shot from floor level tilted sharply up toward the ceiling"},
+
+        {"id": "hoch-b", "label": "Von oben", "bildausschnitt": "Porträt",
+         "wortlaut": "steep high-angle shot looking sharply down at her from overhead, floor visible behind her shoulders as she looks up"},
+
+        {"id": "aufsicht-b", "label": "Vogelperspektive", "bildausschnitt": "Halbtotale",
+         "feste": {"pose": {"preset": "haltung/Auf dem Rücken liegend"}},
+         "wortlaut": "90-degree top-down flat-lay photograph shot straight down from the ceiling, wooden floorboards filling the whole background beneath her"},
+        {"id": "aufsicht-c", "label": "Vogelperspektive", "bildausschnitt": "Ganzkörper",
+         "feste": {"pose": {"preset": "haltung/Auf dem Rücken liegend"}},
+         "wortlaut": "vertical overhead bird's-eye view straight down at the floor, top-down 90-degree angle looking directly down at her lying flat on the floor"},
+
+        {"id": "dutch-b", "label": "Dutch Angle", "bildausschnitt": "Halbtotale",
+         "wortlaut": "Dutch angle shot, tilted diagonal horizon, camera rolled sideways for a slanted dynamic frame"},
+        {"id": "dutch-k2", "label": "Dutch Angle", "bildausschnitt": "Halbtotale", "kontrolle": true,
+         "wortlaut": "Dutch angle"}
+      ]
+    }
+  ]
+}

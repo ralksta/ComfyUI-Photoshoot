@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" width="560" height="140"
+     role="img" aria-label="Photoshoot">
+  <title>Photoshoot</title>
+
+  <!-- GitHub bindet das SVG als <img> ein, currentColor gibt es dort nicht -
+       ohne diese Regel waere die Wortmarke im dunklen Thema schwarz auf
+       schwarz. -->
+  <style>
+    .wort { fill: #1b1d21; }
+    @media (prefers-color-scheme: dark) { .wort { fill: #e8eaed; } }
+  </style>
+
+  <!-- Das Motiv ist der Kontaktbogen: sechs Bilder derselben Serie, in
+       unterschiedlichen Formaten, weil das Seitenverhaeltnis der
+       Kameraeinstellung folgt. Eines ist hervorgehoben - dieselbe Person,
+       naeher dran. -->
+  <g transform="translate(14 18)">
+    <g fill="none" stroke="#8a8f98" stroke-width="3.2">
+      <rect x="0"   y="0"  width="30" height="42" rx="4"/>
+      <rect x="38"  y="0"  width="42" height="42" rx="4"/>
+      <rect x="0"   y="50" width="42" height="30" rx="4"/>
+      <rect x="50"  y="50" width="30" height="30" rx="4"/>
+    </g>
+    <!-- Der belichtete Frame. Die Figur darin ist bewusst nur angedeutet:
+         Kopf und Schultern, wie in einem Portraet. -->
+    <rect x="38" y="0" width="42" height="42" rx="4" fill="#f66744"/>
+    <circle cx="59" cy="15" r="6" fill="#1b1d21"/>
+    <path d="M45 42 a14 14 0 0 1 28 0 z" fill="#1b1d21"/>
+  </g>
+
+  <text x="112" y="72" font-family="Ubuntu, 'Open Sans', 'DejaVu Sans', sans-serif"
+        font-size="46" font-weight="700" class="wort" letter-spacing="-0.5">
+    Photoshoot
+  </text>
+  <text x="114" y="100" font-family="Ubuntu, 'Open Sans', 'DejaVu Sans', sans-serif"
+        font-size="15.5" font-weight="400" fill="#8a8f98" letter-spacing="0.3">
+    one person · a whole series · ComfyUI
+  </text>
+</svg>

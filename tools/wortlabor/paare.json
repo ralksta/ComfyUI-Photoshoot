@@ -1,0 +1,88 @@
+{
+  "format": "photoshoot-wortlabor/1",
+  "zweck": "Two people / couples in Krea 2: minimize attribute bleed between Person 1 and Person 2 and verify basic couple interactions.",
+  "bildformat": "4:5",
+  "seeds": [42, 776610, 1401181143],
+  "basis": {
+    "von": "beispiel-workflow",
+    "bildausschnitt": "Halbtotale",
+    "kamera_mit_ausschnitt": true,
+    "vorlage": "{style}, {camera}, {scene}, {lighting}, {pose}"
+  },
+  "gruppen": [
+    {
+      "id": "A",
+      "titel": "Couple Prompt Structure (Anti-Attribute-Bleed)",
+      "slot": "pose",
+      "feste": {
+        "style": {"basis": true},
+        "scene": {"basis": true},
+        "lighting": {"basis": true}
+      },
+      "kandidaten": [
+        {
+          "id": "komma-a",
+          "label": "A: Komma + left/right",
+          "wortlaut": "two people standing side by side, on the left a woman, in her late 20s, Scandinavian features, long wavy natural copper red hair, freckles, wearing a black fitted turtleneck top, wearing a forest green wool coat, wearing dark blue jeans, on the right a man, in his early 30s, short dark brown hair, dark stubble, wearing an ivory crewneck sweater, wearing a camel trench coat, wearing charcoal wool trousers"
+        },
+        {
+          "id": "satz-b",
+          "label": "B: Zwei Sätze + On the left / right",
+          "wortlaut": "Two people standing side by side. On the left, a woman in her late 20s, Scandinavian features, long wavy natural copper red hair, freckles, wearing a black fitted turtleneck top, forest green wool coat, dark blue jeans. On the right, a man in his early 30s, short dark brown hair, dark stubble, wearing an ivory crewneck sweater, camel trench coat, charcoal wool trousers."
+        },
+        {
+          "id": "nummer-c",
+          "label": "C: Person 1 / Person 2 getrennt",
+          "wortlaut": "Two people standing side by side; person 1 on the left is a woman in her late 20s with long wavy copper red hair and freckles wearing a forest green wool coat over a black turtleneck and dark blue jeans; person 2 on the right is a man in his early 30s with short dark brown hair and dark stubble wearing a camel trench coat over an ivory sweater and charcoal trousers"
+        },
+        {
+          "id": "shehe-d",
+          "label": "D: Duo mit he / she",
+          "wortlaut": "a couple standing side by side, she is a woman in her late 20s with long wavy copper red hair and freckles wearing a forest green wool coat and dark blue jeans, he is a man in his early 30s with short dark brown hair and dark stubble wearing a camel trench coat and charcoal trousers"
+        },
+        {
+          "id": "kontrolle-k",
+          "label": "K: Kontrolle ohne Position",
+          "wortlaut": "a woman in her late 20s with long wavy copper red hair and freckles wearing a forest green wool coat and dark blue jeans, and a man in his early 30s with short dark brown hair and dark stubble wearing a camel trench coat and charcoal trousers, standing side by side"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "titel": "Couple Interactions (Verifizierte Grundhaltungen)",
+      "slot": "pose",
+      "feste": {
+        "style": {"basis": true},
+        "scene": {"basis": true},
+        "lighting": {"basis": true}
+      },
+      "kandidaten": [
+        {
+          "id": "nebeneinander-b",
+          "label": "Nebeneinander stehend",
+          "wortlaut": "Two people standing side by side, relaxed together. On the left, a woman in her late 20s with long wavy copper red hair and freckles wears a forest green wool coat and dark blue jeans. On the right, a man in his early 30s with short dark brown hair and dark stubble wears a camel trench coat and charcoal trousers."
+        },
+        {
+          "id": "eingehakt-b",
+          "label": "Arm in Arm gehend",
+          "wortlaut": "Two people walking arm in arm toward the camera. On the left, a woman in her late 20s with long wavy copper red hair and freckles wears a forest green wool coat and dark blue jeans. On the right, a man in his early 30s with short dark brown hair and dark stubble wears a camel trench coat and charcoal trousers."
+        },
+        {
+          "id": "zugewandt-b",
+          "label": "Einander zugewandt",
+          "wortlaut": "Two people standing facing each other closely, looking into each other's eyes. On the left, a woman in her late 20s with long wavy copper red hair and freckles wears a forest green wool coat and dark blue jeans. On the right, a man in his early 30s with short dark brown hair and dark stubble wears a camel trench coat and charcoal trousers."
+        },
+        {
+          "id": "ruecken-b",
+          "label": "Rücken an Rücken",
+          "wortlaut": "Two people standing back to back, both looking toward the camera. On the left, a woman in her late 20s with long wavy copper red hair and freckles wears a forest green wool coat and dark blue jeans. On the right, a man in his early 30s with short dark brown hair and dark stubble wears a camel trench coat and charcoal trousers."
+        },
+        {
+          "id": "umarmt-b",
+          "label": "Arm um die Schulter",
+          "wortlaut": "Two people standing close together, one arm draped warmly around the other's shoulders. On the left, a woman in her late 20s with long wavy copper red hair and freckles wears a forest green wool coat and dark blue jeans. On the right, a man in his early 30s with short dark brown hair and dark stubble wears a camel trench coat and charcoal trousers."
+        }
+      ]
+    }
+  ]
+}

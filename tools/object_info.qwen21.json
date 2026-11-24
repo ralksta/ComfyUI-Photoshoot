@@ -1,0 +1,339 @@
+{
+ "_": "Core-node signatures of the reference workflow (Qwen-Image-2.1) for tools/baue_workflow.py, cut from /object_info of a ComfyUI that has those nodes. Regenerate with: python3 tools/baue_workflow.py --snapshot --referenz",
+ "comfyui_version": "0.38.0",
+ "nodes": {
+  "CLIPLoader": {
+   "input": {
+    "required": {
+     "clip_name": [
+      "COMBO"
+     ],
+     "type": [
+      "COMBO"
+     ]
+    },
+    "optional": {
+     "device": [
+      "COMBO"
+     ]
+    }
+   },
+   "output": [
+    "CLIP"
+   ],
+   "output_name": [
+    "CLIP"
+   ]
+  },
+  "ComfySwitchNode": {
+   "input": {
+    "required": {
+     "switch": [
+      "BOOLEAN"
+     ]
+    },
+    "optional": {
+     "on_false": [
+      "COMFY_MATCHTYPE_V3"
+     ],
+     "on_true": [
+      "COMFY_MATCHTYPE_V3"
+     ]
+    }
+   },
+   "output": [
+    "COMFY_MATCHTYPE_V3"
+   ],
+   "output_name": [
+    "output"
+   ]
+  },
+  "EmptyLatentImage": {
+   "input": {
+    "required": {
+     "width": [
+      "INT"
+     ],
+     "height": [
+      "INT"
+     ],
+     "batch_size": [
+      "INT"
+     ]
+    }
+   },
+   "output": [
+    "LATENT"
+   ],
+   "output_name": [
+    "LATENT"
+   ]
+  },
+  "KSampler": {
+   "input": {
+    "required": {
+     "model": [
+      "MODEL"
+     ],
+     "seed": [
+      "INT"
+     ],
+     "steps": [
+      "INT"
+     ],
+     "cfg": [
+      "FLOAT"
+     ],
+     "sampler_name": [
+      "COMBO"
+     ],
+     "scheduler": [
+      "COMBO"
+     ],
+     "positive": [
+      "CONDITIONING"
+     ],
+     "negative": [
+      "CONDITIONING"
+     ],
+     "latent_image": [
+      "LATENT"
+     ],
+     "denoise": [
+      "FLOAT"
+     ]
+    }
+   },
+   "output": [
+    "LATENT"
+   ],
+   "output_name": [
+    "LATENT"
+   ]
+  },
+  "LoadImage": {
+   "input": {
+    "required": {
+     "image": [
+      "COMBO"
+     ]
+    }
+   },
+   "output": [
+    "IMAGE",
+    "MASK"
+   ],
+   "output_name": [
+    "IMAGE",
+    "MASK"
+   ]
+  },
+  "LoraLoaderModelOnly": {
+   "input": {
+    "required": {
+     "model": [
+      "MODEL"
+     ],
+     "lora_name": [
+      "COMBO"
+     ],
+     "strength_model": [
+      "FLOAT"
+     ]
+    }
+   },
+   "output": [
+    "MODEL"
+   ],
+   "output_name": [
+    "MODEL"
+   ]
+  },
+  "PrimitiveStringMultiline": {
+   "input": {
+    "required": {
+     "value": [
+      "STRING"
+     ]
+    }
+   },
+   "output": [
+    "STRING"
+   ],
+   "output_name": [
+    "STRING"
+   ]
+  },
+  "QwenImage21Cache": {
+   "input": {
+    "required": {
+     "model": [
+      "MODEL"
+     ],
+     "device": [
+      "COMBO"
+     ],
+     "dtype": [
+      "COMBO"
+     ]
+    }
+   },
+   "output": [
+    "MODEL"
+   ],
+   "output_name": [
+    "MODEL"
+   ]
+  },
+  "SaveImage": {
+   "input": {
+    "required": {
+     "images": [
+      "IMAGE"
+     ],
+     "filename_prefix": [
+      "STRING"
+     ]
+    }
+   },
+   "output": [
+    "IMAGE"
+   ],
+   "output_name": [
+    "images"
+   ]
+  },
+  "TextEncodeQwenImage21": {
+   "input": {
+    "required": {
+     "clip": [
+      "CLIP"
+     ],
+     "prompt": [
+      "STRING"
+     ],
+     "negative_prompt": [
+      "STRING"
+     ],
+     "resolution": [
+      "INT"
+     ]
+    },
+    "optional": {
+     "vae": [
+      "VAE"
+     ],
+     "images.image_1": [
+      "IMAGE"
+     ],
+     "images.image_2": [
+      "IMAGE"
+     ],
+     "images.image_3": [
+      "IMAGE"
+     ],
+     "images.image_4": [
+      "IMAGE"
+     ],
+     "images.image_5": [
+      "IMAGE"
+     ],
+     "images.image_6": [
+      "IMAGE"
+     ],
+     "images.image_7": [
+      "IMAGE"
+     ],
+     "images.image_8": [
+      "IMAGE"
+     ],
+     "images.image_9": [
+      "IMAGE"
+     ],
+     "images.image_10": [
+      "IMAGE"
+     ],
+     "images.image_11": [
+      "IMAGE"
+     ],
+     "images.image_12": [
+      "IMAGE"
+     ],
+     "images.image_13": [
+      "IMAGE"
+     ],
+     "images.image_14": [
+      "IMAGE"
+     ],
+     "images.image_15": [
+      "IMAGE"
+     ],
+     "images.image_16": [
+      "IMAGE"
+     ]
+    }
+   },
+   "output": [
+    "CONDITIONING",
+    "CONDITIONING",
+    "LATENT"
+   ],
+   "output_name": [
+    "positive",
+    "negative",
+    "latent"
+   ]
+  },
+  "UNETLoader": {
+   "input": {
+    "required": {
+     "unet_name": [
+      "COMBO"
+     ],
+     "weight_dtype": [
+      "COMBO"
+     ]
+    }
+   },
+   "output": [
+    "MODEL"
+   ],
+   "output_name": [
+    "MODEL"
+   ]
+  },
+  "VAEDecode": {
+   "input": {
+    "required": {
+     "samples": [
+      "LATENT"
+     ],
+     "vae": [
+      "VAE"
+     ]
+    }
+   },
+   "output": [
+    "IMAGE"
+   ],
+   "output_name": [
+    "IMAGE"
+   ]
+  },
+  "VAELoader": {
+   "input": {
+    "required": {
+     "vae_name": [
+      "COMBO"
+     ]
+    }
+   },
+   "output": [
+    "VAE"
+   ],
+   "output_name": [
+    "VAE"
+   ]
+  }
+ }
+}

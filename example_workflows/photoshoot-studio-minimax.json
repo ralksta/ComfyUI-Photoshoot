@@ -1,0 +1,891 @@
+{
+  "id": "krea2-photoshoot-studio-minimax",
+  "revision": 0,
+  "last_node_id": 95,
+  "last_link_id": 17,
+  "nodes": [
+    {
+      "id": 90,
+      "type": "MarkdownNote",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        340,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Models.** MiniMax-H3-Image (6-step 2K model) with its 32B Qwen3-VL text encoder and VAE under Comfy-Org names. **LoRA:** pick a file below and press Ctrl+B to enable."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_pruned_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/diffusion_models/minimax_h3_image_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "title": "MiniMax-H3-Image",
+      "widgets_values": [
+        "minimax_h3_image_pruned_int8_convrot.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        40,
+        340
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+        "minimax",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        40,
+        480
+      ],
+      "size": [
+        340,
+        90
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            3,
+            14
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_image_vae_fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3-Image/resolve/main/vae/minimax_h3_image_vae_fp16.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_image_vae_fp16.safetensors"
+      ]
+    },
+    {
+      "id": 93,
+      "type": "MarkdownNote",
+      "pos": [
+        460,
+        60
+      ],
+      "size": [
+        440,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**All-in-One Studio.** Open the **Photoshoot Studio** tab in the left sidebar (or click **edit** below) to configure **Person**, **Wardrobe**, **Look**, **Pose** and **Shoot** in one place without extra nodes on the canvas. **Black & white?** Pick a black & white *Look* under *Look → Style*, then switch on *Monochrome* on the right (Ctrl+B). Press **Start shooting** to run. [All controls](https://github.com/ralksta/ComfyUI-Photoshoot/blob/main/docs/nodes.md)"
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 11,
+      "type": "Krea2Photoshooting",
+      "pos": [
+        460,
+        200
+      ],
+      "size": [
+        440,
+        530
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "pose",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 0
+        },
+        {
+          "name": "ausdruck",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "kamera",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 2
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            5
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            6
+          ],
+          "slot_index": 4
+        },
+        {
+          "name": "bildseed",
+          "type": "INT",
+          "links": [
+            12
+          ],
+          "slot_index": 5
+        },
+        {
+          "name": "person",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 6
+        },
+        {
+          "name": "person_data",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 7
+        },
+        {
+          "name": "kamera_label",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 8
+        },
+        {
+          "name": "refine",
+          "type": "BOOLEAN",
+          "links": [],
+          "slot_index": 9
+        },
+        {
+          "name": "dateiname",
+          "type": "STRING",
+          "links": [
+            17
+          ],
+          "slot_index": 10
+        },
+        {
+          "name": "caption",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 11
+        },
+        {
+          "name": "foto",
+          "type": "INT",
+          "links": [],
+          "slot_index": 12
+        },
+        {
+          "name": "szene",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 13
+        },
+        {
+          "name": "licht",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 14
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            4
+          ],
+          "slot_index": 15
+        },
+        {
+          "name": "motion",
+          "type": "STRING",
+          "links": [],
+          "slot_index": 16
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Photoshooting",
+        "photoshootAnsicht": "kompakt",
+        "photoshootVollHoehe": 1090,
+        "studioModus": true,
+        "personState": "{\"felder\": {\"gender\": \"Frau\", \"age\": \"Ende 20\", \"ethnicity\": \"Skandinavisch\", \"skinTone\": \"Sehr hell\", \"complexion\": \"Natürliche Poren\", \"height\": \"Groß\", \"figure\": \"Athletisch\", \"shoulders\": \"Sportlich\", \"hair\": \"Lange Wellen\", \"hairColor\": \"Rot / Kupfer\", \"eyeShape\": \"Mandelförmig\", \"eyes\": \"Graugrün\", \"cheekbones\": \"Hoch betont\", \"nose\": \"Gerade\", \"lipColor\": \"Altrosa\", \"lipFinish\": \"Matt\"}, \"mehrfach\": {\"skinFeatures\": [\"Sommersprossen\"]}, \"texte\": {\"ageExact\": \"\", \"details\": \"\"}, \"sektion\": null, \"gruppe\": {\"shoes\": \"alle\"}}",
+        "wardrobeState": "{\"outfits\": [{\"id\": \"mantel\", \"name\": \"Coat\", \"felder\": {\"top\": \"Ärmelloser Rollkragen\", \"topColor\": \"Schwarz\", \"hosiery\": \"Nackte Beine\", \"shoes\": \"Combat Boots\", \"shoesColor\": \"Schwarz\"}, \"texte\": {\"details\": \"wearing a charcoal wool coat\"}}, {\"id\": \"cafe\", \"name\": \"Café\", \"felder\": {\"top\": \"Bardot-Top\", \"topColor\": \"Creme\", \"bottom\": \"Plisseerock midi\", \"bottomColor\": \"Beige\", \"shoes\": \"Blockabsatz-Pumps\", \"shoesColor\": \"Schwarz\", \"prop\": \"Kaffeetasse\"}, \"texte\": {\"details\": \"\"}}], \"aktiv\": 0, \"sektion\": null, \"vorschauArt\": \"puppe\"}",
+        "lightingState": "{\"felder\": {\"setup\": \"Softbox diffuses Licht\", \"richtung\": \"Frontal 45°\", \"atmosphaere\": \"Klar & gestochen scharf\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}",
+        "styleState": "{\"felder\": {\"look\": \"—\", \"genre\": \"Editorial\", \"optik\": \"85mm f/1.4\", \"finish\": \"—\"}, \"wuerfeln\": {}, \"gruppe\": \"alle\", \"details\": \"\"}",
+        "locationState": "{\"saetze\": [{\"id\": \"loft\", \"name\": \"Loft\", \"felder\": {\"ort\": \"Sonniges Loft\"}, \"wuerfeln\": {}, \"gruppe\": \"innen\", \"details\": \"\"}], \"aktiv\": 0, \"sektion\": null}",
+        "shootingState": "{\"modellProfil\": \"kompakt\", \"groesse\": 2048, \"ordner\": \"photoshoot/minimax\"}",
+        "templateText": "{style}, {expression}, {camera}, {scene}, {lighting}, {person}, {pose}"
+      },
+      "widgets_values": [
+        1,
+        "increment"
+      ]
+    },
+    {
+      "id": 95,
+      "type": "MarkdownNote",
+      "pos": [
+        980,
+        60
+      ],
+      "size": [
+        740,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "MarkdownNote"
+      },
+      "title": "read me",
+      "widgets_values": [
+        "**Single-pass 2K render.** MiniMax-H3-Image runs natively at ~2K (1536–2304 px) in 6 Euler steps at CFG 1.0 — no two-pass refine needed. In **Studio → Your setup**, switch *Model profile* between *Compact* and *Krea 2*. Select *Monochrome* and press Ctrl+B for B&W."
+      ],
+      "color": "#2b2b2b",
+      "bgcolor": "#1f1f1f"
+    },
+    {
+      "id": 4,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        40,
+        610
+      ],
+      "size": [
+        340,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "title": "optional LoRA - pick a file, then Ctrl+B",
+      "widgets_values": [
+        "your-lora.safetensors",
+        1.0
+      ]
+    },
+    {
+      "id": 31,
+      "type": "MiniMaxH3ImageConditioning",
+      "pos": [
+        980,
+        200
+      ],
+      "size": [
+        360,
+        220
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 3
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 5,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 6,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            7,
+            8
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            10
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageConditioning"
+      },
+      "widgets_values": [
+        "",
+        2048,
+        2048
+      ]
+    },
+    {
+      "id": 32,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        980,
+        460
+      ],
+      "size": [
+        260,
+        70
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "title": "negative = empty"
+    },
+    {
+      "id": 40,
+      "type": "KSampler",
+      "pos": [
+        1380,
+        200
+      ],
+      "size": [
+        340,
+        280
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 8
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 9
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 10
+        },
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 11
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 12,
+          "widget": {
+            "name": "seed"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            13
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        0,
+        "fixed",
+        6,
+        1.0,
+        "euler",
+        "simple",
+        1.0
+      ]
+    },
+    {
+      "id": 50,
+      "type": "VAEDecode",
+      "pos": [
+        1380,
+        520
+      ],
+      "size": [
+        260,
+        80
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 13
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 52,
+      "type": "Krea2Monochrome",
+      "pos": [
+        1380,
+        640
+      ],
+      "size": [
+        340,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 15
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Krea2Monochrome"
+      },
+      "widgets_values": [
+        "Neutral",
+        1.0
+      ],
+      "color": "#5a2a15",
+      "bgcolor": "#8a4a25"
+    },
+    {
+      "id": 51,
+      "type": "SaveImage",
+      "pos": [
+        1380,
+        790
+      ],
+      "size": [
+        360,
+        460
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 16
+        },
+        {
+          "name": "filename_prefix",
+          "type": "STRING",
+          "link": 17,
+          "widget": {
+            "name": "filename_prefix"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "photoshoot/%date:yyyy-MM-dd%/minimax"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      4,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      2,
+      0,
+      31,
+      0,
+      "CLIP"
+    ],
+    [
+      3,
+      3,
+      0,
+      31,
+      1,
+      "VAE"
+    ],
+    [
+      4,
+      11,
+      15,
+      31,
+      2,
+      "STRING"
+    ],
+    [
+      5,
+      11,
+      3,
+      31,
+      3,
+      "INT"
+    ],
+    [
+      6,
+      11,
+      4,
+      31,
+      4,
+      "INT"
+    ],
+    [
+      7,
+      31,
+      0,
+      32,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      8,
+      31,
+      0,
+      40,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      9,
+      32,
+      0,
+      40,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      10,
+      31,
+      1,
+      40,
+      2,
+      "LATENT"
+    ],
+    [
+      11,
+      4,
+      0,
+      40,
+      3,
+      "MODEL"
+    ],
+    [
+      12,
+      11,
+      5,
+      40,
+      4,
+      "INT"
+    ],
+    [
+      13,
+      40,
+      0,
+      50,
+      0,
+      "LATENT"
+    ],
+    [
+      14,
+      3,
+      0,
+      50,
+      1,
+      "VAE"
+    ],
+    [
+      15,
+      50,
+      0,
+      52,
+      0,
+      "IMAGE"
+    ],
+    [
+      16,
+      52,
+      0,
+      51,
+      0,
+      "IMAGE"
+    ],
+    [
+      17,
+      11,
+      10,
+      51,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "0 · Models",
+      "bounding": [
+        10,
+        -10,
+        400,
+        780
+      ],
+      "color": "#3f5159",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "1 · The shoot",
+      "bounding": [
+        430,
+        -10,
+        500,
+        770
+      ],
+      "color": "#5f4f3f",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "2 · Render",
+      "bounding": [
+        950,
+        -10,
+        820,
+        1290
+      ],
+      "color": "#3f5f44",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        80,
+        60
+      ]
+    }
+  },
+  "version": 0.4
+}
